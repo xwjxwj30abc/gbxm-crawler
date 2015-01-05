@@ -1,0 +1,22 @@
+
+
+Signature base string
+GET&https%3A%2F%2Fapi.twitter.com%2F1.1%2Fusers%2Fshow.json&
+oauth_consumer_key%3DI57Q98TSGB7Lay64XMIFtjbp4%26
+oauth_nonce%3D4736ee2d613a5c88d539c40cf051d3a9%26
+oauth_signature_method%3DHMAC-SHA1%26
+oauth_timestamp%3D1420372052%26
+oauth_token%3D2879495431-wJ1jPbTCpPmkFxf0fOGdxbM4oFhRSAIF1bTvGgy%26
+oauth_version%3D1.0%26screen_name%3Drsarver
+
+Authorization header
+Authorization: OAuth 
+oauth_consumer_key="I57Q98TSGB7Lay64XMIFtjbp4", 
+oauth_nonce="4736ee2d613a5c88d539c40cf051d3a9", 
+oauth_signature="bPhxAaqAS3lzKj83ywN%2BrBAimRU%3D", 
+oauth_signature_method="HMAC-SHA1", oauth_timestamp="1420372052", 
+oauth_token="2879495431-wJ1jPbTCpPmkFxf0fOGdxbM4oFhRSAIF1bTvGgy", 
+oauth_version="1.0"
+
+cURL command
+curl --get 'https://api.twitter.com/1.1/users/show.json' --data 'screen_name=rsarver' --header 'Authorization: OAuth oauth_consumer_key="I57Q98TSGB7Lay64XMIFtjbp4", oauth_nonce="4736ee2d613a5c88d539c40cf051d3a9", oauth_signature="bPhxAaqAS3lzKj83ywN%2BrBAimRU%3D", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1420372052", oauth_token="2879495431-wJ1jPbTCpPmkFxf0fOGdxbM4oFhRSAIF1bTvGgy", oauth_version="1.0"' --verbose
