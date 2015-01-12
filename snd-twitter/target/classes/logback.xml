@@ -9,7 +9,7 @@
 
 	<appender name="File"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>logs/demo01.log</file>
+		<file>logs/snd-twitter.log</file>
 		<encoder>
 			<pattern>%d{ISO8601} [%thread] %-5level %logger{36} [Line:%-3L] -
 				%msg%n</pattern>
