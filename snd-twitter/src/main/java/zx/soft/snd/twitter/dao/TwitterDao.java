@@ -9,7 +9,7 @@ import zx.soft.snd.twitter.domain.StatusInfo;
 import zx.soft.snd.twitter.domain.Token;
 
 public interface TwitterDao {
-	public static final int PAGECOUNT = 2;
+	public static final int PAGECOUNT = 100;
 
 	@Select("SELECT name FROM ${tablename} WHERE id BETWEEN #{from} AND (#{from}+" + (PAGECOUNT - 1) + ")")
 	public List<String> getNameList(@Param("tablename") String tablename, @Param("from") int from);
