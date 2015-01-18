@@ -2,9 +2,10 @@
 <!DOCTYPE configuration
   PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
+ 
 <configuration>
 <typeAliases>
-<typeAlias type="zx.soft.snd.twitter.domain.StatusInfo" alias="StatusInfo"/>
+<typeAlias type="zx.soft.snd.web.domain.Token" alias="Token"/>
 </typeAliases>
 	<environments default="development">
 		<environment id="development">
