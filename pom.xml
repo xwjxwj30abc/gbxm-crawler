@@ -8,18 +8,18 @@
 		<version>1.0.0</version>
 	</parent>
 
-	<artifactId>sns-crawler</artifactId>
+	<artifactId>gbxm-crawler</artifactId>
 	<packaging>pom</packaging>
-	<name>SNS-Crawler</name>
+	<name>GBXM Crawler</name>
 	<description>socila network service crawler</description>
 
 	<modules>
-		<module>snd-core</module>
-		<module>snd-dao</module>
-		<module>snd-web</module>
-		<module>snd-twitter</module>
-		<module>snd-facebook</module>
-		<module>snd-google</module>
+		<module>gbxm-core</module>
+		<module>gbxm-dao</module>
+		<module>gbxm-web</module>
+		<module>gbxm-twitter</module>
+		<module>gbxm-facebook</module>
+		<module>gbxm-google</module>
 	</modules>
 
 	<dependencies>
