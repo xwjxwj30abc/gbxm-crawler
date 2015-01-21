@@ -1,6 +1,10 @@
 *.class
+<<<<<<< HEAD
 .settings/
 .project
+=======
+
+>>>>>>> 2de0f8e005105f3547396154036de5fe23a9d2e7
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
