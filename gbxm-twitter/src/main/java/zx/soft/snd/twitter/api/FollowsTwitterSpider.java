@@ -1,40 +1,85 @@
-package zx.soft.gbxm.twitter.api;
+package zx.soft.snd.twitter.api;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import twitter4j.Paging;
+import twitter4j.ResponseList;
 import twitter4j.Status;
+import twitter4j.Twitter;
 import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
 import twitter4j.User;
+import twitter4j.auth.AccessToken;
 import zx.soft.snd.twitter.dao.TwitterDaoImpl;
 import zx.soft.snd.twitter.domain.StatusInfo;
 import zx.soft.snd.twitter.domain.UserInfo;
+import zx.soft.utils.config.ConfigUtil;
 
-public class TwitterSpider {
-
-	private static Logger logger = LoggerFactory.getLogger(TwitterSpider.class);
-	private TwitterApi twitterApi;
+public class FollowsTwitterSpider {
+	public static Logger logger = LoggerFactory.getLogger(TwitterApi.class);
 	private TwitterDaoImpl twitterDaoImpl;
+	private static Twitter twitter;
+	private static final int COUNT = 200;//每页的数量,取最大值200
+	private static int page = 1;//获取第一页信息
+	private static long sinceId = 1L;
 
-	public TwitterSpider() {
-		twitterApi = new TwitterApi();
+	public FollowsTwitterSpider(AccessToken accessToken) {
 		twitterDaoImpl = new TwitterDaoImpl();
+		Properties prop = ConfigUtil.getProps("oauthconsumer.properties");
+		twitter = new TwitterFactory().getInstance();
+		twitter.setOAuthConsumer(prop.getProperty("consumerKey"), prop.getProperty("consumerSecret"));
+		twitter.setOAuthAccessToken(accessToken);
 	}
 
 	/**
-	 * 插入获得的所有关注用户的更新信息到数据库并更新token 中的sinceId
-	 * @throws InterruptedException
+	 * 获取twitter用户的主页动态信息
+	 * @return
 	 * @throws TwitterException
-	 * @throws UnsupportedEncodingException
+	 * @throws InterruptedException
 	 */
-	public void run() throws InterruptedException {
-		List<Status> statuses = null;
+	private List<Status> getHomeTimeLine() {
+		List<Status> statuses = new ArrayList<>();
+		boolean flag = true;
+		long lastTimeSinceId = sinceId;
+		while (flag) {
+			try {
+				Paging nextPaging = new Paging(page++, COUNT, lastTimeSinceId);
+				ResponseList<Status> nextStatuses = twitter.getHomeTimeline(nextPaging);
+				logger.info("page=" + page + ",size=" + nextStatuses.size());
+				if (nextStatuses.size() == 0) {
+					flag = false;
+				} else {
+					statuses.addAll(nextStatuses);
+					sinceId = statuses.get(0).getId();
+					nextStatuses = null;
+				}
+			} catch (TwitterException e) {
+				logger.info("page too long...start sleep 15min");
+				try {
+					Thread.sleep(900000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				page--;
+			}
+		}
+		page = 1;
+		return statuses;
+	}
+
+	/**
+	 * 获得状态信息插入状态数据库，并更新用户信息
+	 * @return  状态信息的长度
+	 * @throws InterruptedException
+	 */
+	public int run() throws InterruptedException {
 		List<StatusInfo> statusInfos = new ArrayList<>();
-		statuses = twitterApi.getHomeTimeLine();
+		List<Status> statuses = getHomeTimeLine();
 		if (statuses.size() != 0) {
 			for (Status status : statuses) {
 				StatusInfo statusInfo = new StatusInfo();
@@ -84,10 +129,7 @@ public class TwitterSpider {
 			statuses = null;
 			twitterDaoImpl.insertStatusInfo(statusInfos);
 		}
+		return statusInfos.size();
 	}
 
-	public static void main(String[] args) throws InterruptedException {
-		TwitterSpider spider = new TwitterSpider();
-		spider.run();
-	}
 }
