@@ -4,9 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import twitter4j.Status;
 import twitter4j.TwitterException;
 import twitter4j.User;
@@ -16,7 +13,6 @@ import zx.soft.snd.twitter.domain.UserInfo;
 
 public class TwitterSpider {
 
-	private static Logger logger = LoggerFactory.getLogger(TwitterSpider.class);
 	private TwitterApi twitterApi;
 	private TwitterDaoImpl twitterDaoImpl;
 

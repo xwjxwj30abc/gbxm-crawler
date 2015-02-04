@@ -21,7 +21,7 @@ import zx.soft.snd.twitter.domain.UserInfo;
 import zx.soft.utils.config.ConfigUtil;
 
 public class FollowsTwitterSpider {
-	public static Logger logger = LoggerFactory.getLogger(TwitterApi.class);
+	public static Logger logger = LoggerFactory.getLogger(FollowsTwitterSpider.class);
 	private TwitterDaoImpl twitterDaoImpl;
 	private static Twitter twitter;
 	private static final int COUNT = 200;//每页的数量,取最大值200
@@ -42,15 +42,16 @@ public class FollowsTwitterSpider {
 	 * @throws TwitterException
 	 * @throws InterruptedException
 	 */
-	private List<Status> getHomeTimeLine() {
+	private List<Status> getHomeTimeLine() throws InterruptedException {
 		List<Status> statuses = new ArrayList<>();
 		boolean flag = true;
 		long lastTimeSinceId = sinceId;
 		while (flag) {
 			try {
-				Paging nextPaging = new Paging(page++, COUNT, lastTimeSinceId);
+				Paging nextPaging = new Paging(page, COUNT, lastTimeSinceId);
 				ResponseList<Status> nextStatuses = twitter.getHomeTimeline(nextPaging);
 				logger.info("page=" + page + ",size=" + nextStatuses.size());
+				page++;
 				if (nextStatuses.size() == 0) {
 					flag = false;
 				} else {
@@ -59,13 +60,15 @@ public class FollowsTwitterSpider {
 					nextStatuses = null;
 				}
 			} catch (TwitterException e) {
-				logger.info("page too long...start sleep 15min");
-				try {
+				if (e.getErrorCode() == 88) {
+					logger.info("page too long...start sleep 15min");
 					Thread.sleep(900000);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+					page--;
 				}
-				page--;
+				if (e.isCausedByNetworkIssue()) {
+					logger.info("TwitterException is caused by networkIssue,retry...");
+					page--;
+				}
 			}
 		}
 		page = 1;
