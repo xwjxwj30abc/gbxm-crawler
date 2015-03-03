@@ -63,11 +63,9 @@ public class FollowsTwitterSpider {
 				if (e.getErrorCode() == 88) {
 					logger.info("page too long...start sleep 15min");
 					Thread.sleep(900000);
-					page--;
 				}
 				if (e.isCausedByNetworkIssue()) {
 					logger.info("TwitterException is caused by networkIssue,retry...");
-					page--;
 				}
 			}
 		}

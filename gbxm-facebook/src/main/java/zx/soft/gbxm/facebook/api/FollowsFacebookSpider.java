@@ -1,39 +1,69 @@
 package zx.soft.gbxm.facebook.api;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import zx.soft.utils.config.ConfigUtil;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
 import facebook4j.Post;
 import facebook4j.Reading;
-import facebook4j.ResponseList;
 import facebook4j.auth.AccessToken;
 
 public class FollowsFacebookSpider {
-	public static void main(String[] args) {
 
-		Facebook facebook = new FacebookFactory().getInstance();
-		String token = "CAAEyboPYV4UBAJZBI1NZBVqdj47SEZCCw8WaOz054VfRAEKrpAbT4gayEuXL4SErB6XhREzKLaKek84QgmVHeKNiVMB96Kuu7md8s02RNYUgqnr6kEyrhp3xPUyuAZAE2DMaZCUEQ5teStSZAA9AkOrr7eN0ZCjs9kmyXIafYF8e26hLH8yCqwM6DkhN06eaQCTxFEmQKsVxib8iPodiHpf";
-		AccessToken accessToken = new AccessToken(token, null);
-		facebook.setOAuthAppId("336925216495493", "4d6723811368c72b53ab33a38551dbe1");
+	public static Logger logger = LoggerFactory.getLogger(FollowsFacebookSpider.class);
+	private static Facebook facebook = new FacebookFactory().getInstance();
+	private static int offset = 0;
+	private static int limit = 100;
+	public static int i = 1;
+
+	public FollowsFacebookSpider(AccessToken accessToken) {
+		Properties props = ConfigUtil.getProps("app.properties");
+		facebook.setOAuthAppId(props.getProperty("appSecret"), props.getProperty("appId"));
 		facebook.setOAuthAccessToken(accessToken);
-		Reading reading = new Reading();
-		reading.limit(123);
-		reading.offset(124);
-		Date sinceDate = new Date(1_000L);
-		reading.since(sinceDate);
-		reading.until(new Date());
-		int i = 1;
-		try {
-			ResponseList<Post> feeds = facebook.getHome(reading);
-			for (Post feed : feeds) {
-				System.out.println(i++ + "  name=" + feed.getFrom().getName() + "; createdTime="
-						+ feed.getCreatedTime());
+	}
+
+	/**
+	 * 获得授权用户的订阅即关注用户的公开状态更新
+	 * @return
+	 * @throws InterruptedException
+	 * @throws FacebookException
+	 */
+	public List<Post> getHome(Date since, Date until) throws InterruptedException, FacebookException {
+		List<Post> posts = new ArrayList<>();
+		boolean hasNext = true;
+		logger.info("since=" + since);
+		logger.info("until=" + until);
+		List<Post> homeLines = new ArrayList<>();
+		while (hasNext) {
+			logger.info("offset=" + offset);
+			homeLines = facebook.getHome(new Reading().limit(limit).offset(offset * limit).since(since).until(until));
+			offset++;
+			if (homeLines.size() == 0) {
+				logger.info("already get all updated Post,next return all  Posts...");
+				hasNext = false;
+			} else {
+				logger.info("add  " + homeLines.size() + " Posts");
+				for (Post post : homeLines) {
+					logger.info(i++ + "  from: " + post.getFrom().getName());
+				}
+				posts.addAll(homeLines);
+				homeLines.clear();
 			}
-			System.out.println(feeds.size());
-		} catch (FacebookException e) {
-			e.printStackTrace();
 		}
+		offset = 0;
+		i = 0;
+		return posts;
+	}
+
+	public void updateAccessToken(AccessToken accessToken) {
+		facebook.setOAuthAccessToken(accessToken);
 	}
 }

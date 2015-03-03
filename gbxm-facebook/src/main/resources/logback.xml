@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss:SSS}[%thread] %-5level %logger{5} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="File"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>logs/gbxm-facebook.log</file>
+		<encoder>
+			<pattern>%d{ISO8601} [%thread] %-5level %logger{36} [Line:%-3L] -
+				%msg%n</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>INFO</level>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>logs/gbxm-facebook.log.%d{yyyy-MM-dd}.tar.gz
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<logger name="zx.soft.log" level="INFO" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="File" />
+	</logger>
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>
