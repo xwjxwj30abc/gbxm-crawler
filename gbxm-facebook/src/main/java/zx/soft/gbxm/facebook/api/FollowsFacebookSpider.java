@@ -39,8 +39,6 @@ public class FollowsFacebookSpider {
 	public List<Post> getHome(Date since, Date until) throws InterruptedException, FacebookException {
 		List<Post> posts = new ArrayList<>();
 		boolean hasNext = true;
-		logger.info("since=" + since);
-		logger.info("until=" + until);
 		List<Post> homeLines = new ArrayList<>();
 		while (hasNext) {
 			logger.info("offset=" + offset);
@@ -66,4 +64,5 @@ public class FollowsFacebookSpider {
 	public void updateAccessToken(AccessToken accessToken) {
 		facebook.setOAuthAccessToken(accessToken);
 	}
+
 }
