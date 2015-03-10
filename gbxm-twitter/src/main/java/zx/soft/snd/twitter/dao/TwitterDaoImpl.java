@@ -51,7 +51,7 @@ public class TwitterDaoImpl {
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			TwitterDao dao = sqlSession.getMapper(TwitterDao.class);
 			count = dao.getTableCount(tablename);
-			logger.info(tablename + "\'s length=" + count);
+			//logger.info(tablename + "\'s length=" + count);
 		}
 		return count;
 	}
@@ -122,11 +122,11 @@ public class TwitterDaoImpl {
 	 * 更新Token sinceId到数据库twitterTokens
 	 * @param userInfoes
 	 */
-	public void updateSinceId(long sinceId, long id) {
+	public void updateSinceId(long sinceId, int id) {
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			TwitterDao twitterDao = sqlSession.getMapper(TwitterDao.class);
 			twitterDao.updateToken(sinceId, id);
-			//logger.info("update userInfo:" + userInfo.toString() + "  successful");
+			logger.info("update sinceId:" + sinceId + "where TokenId=" + id + "  successful");
 		}
 	}
 

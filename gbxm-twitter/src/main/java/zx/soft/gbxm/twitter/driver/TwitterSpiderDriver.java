@@ -3,7 +3,7 @@ package zx.soft.gbxm.twitter.driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import zx.soft.snd.twitter.api.TwitterSpider;
+import zx.soft.gbxm.twitter.api.TwitterSpider;
 
 /**
  * 驱动类
