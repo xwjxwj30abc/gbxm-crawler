@@ -15,6 +15,7 @@
 				<include>mybatis-config.xml</include>
 				<include>logback.xml</include>
 				<include>oauthconsumer.properties</include>
+				<include>Mapper.xml</include>
 			</includes>
 			<outputDirectory>/conf</outputDirectory>
 			<filtered>true</filtered>

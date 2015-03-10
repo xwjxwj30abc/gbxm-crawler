@@ -89,6 +89,7 @@
 						<exclude>mybatis-config.xml</exclude>
 						<exclude>logback.xml</exclude>
 						<exclude>oauthconsumer.properties</exclude>
+						<exclude>Mapper.xml</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
