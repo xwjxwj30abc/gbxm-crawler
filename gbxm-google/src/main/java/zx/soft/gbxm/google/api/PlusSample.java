@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import zx.soft.utils.json.JsonUtils;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.DataStoreCredentialRefreshListener;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver.Builder;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -50,7 +51,8 @@ public class PlusSample {
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(
 				PlusSample.class.getResourceAsStream("/client_secrets.json")));
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
-				clientSecrets, Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory).build();
+				clientSecrets, Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory)
+				.addRefreshListener(new DataStoreCredentialRefreshListener(userId, dataStoreFactory)).build();
 		Builder builder = new Builder().setHost("localhost").setPort(8080);
 		return new AuthorizationCodeInstalledApp(flow, builder.build()).authorize(userId);
 	}
@@ -60,6 +62,7 @@ public class PlusSample {
 			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 			dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
 			Credential credential = authorize("test");
+
 			Date expirationTime = new Date(credential.getExpirationTimeMilliseconds());
 			logger.info("token过期时间：" + credential.getExpirationTimeMilliseconds() + "equal  " + expirationTime);
 			plus = new Plus.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME)
@@ -68,7 +71,7 @@ public class PlusSample {
 			while (true) {
 				updateActivities("110924633889503463658");
 				Thread.sleep(3 * 60 * 1000);
-				credential = authorize("tes");
+				credential = authorize("test");
 				expirationTime = new Date(credential.getExpirationTimeMilliseconds());
 				logger.info("token过期时间：" + expirationTime);
 				plus = new Plus.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME)
