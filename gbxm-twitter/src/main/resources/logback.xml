@@ -9,7 +9,7 @@
 
 	<appender name="File"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>logs/snd-twitter.log</file>
+		<file>logs/gbxm-twitter.log</file>
 		<encoder>
 			<pattern>%d{ISO8601} [%thread] %-5level %logger{36} [Line:%-3L] -
 				%msg%n</pattern>
@@ -18,7 +18,7 @@
 			<level>INFO</level>
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>logs/snd-twitter.log.%d{yyyy-MM-dd}.tar.gz
+			<fileNamePattern>logs/gbxm-twitter.log.%d{yyyy-MM-dd}.tar.gz
 			</fileNamePattern>
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
@@ -29,7 +29,8 @@
 		<appender-ref ref="File" />
 	</logger>
 
-	<root level="INFO">
+	<root level="DEBUGE">
 		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE"/>
 	</root>
 </configuration>

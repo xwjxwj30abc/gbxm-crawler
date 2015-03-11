@@ -1,4 +1,4 @@
-package zx.soft.snd.twitter.dao;
+package zx.soft.gbxm.twitter.dao;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -8,10 +8,10 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import zx.soft.snd.twitter.domain.StatusInfo;
-import zx.soft.snd.twitter.domain.Token;
-import zx.soft.snd.twitter.domain.UserInfo;
-import zx.soft.snd.web.utils.MybatisConfig;
+import zx.soft.gbxm.twitter.domain.StatusInfo;
+import zx.soft.gbxm.twitter.domain.Token;
+import zx.soft.gbxm.twitter.domain.UserInfo;
+import zx.soft.gbxm.twitter.utils.MybatisConfig;
 
 public class TwitterDaoImpl {
 

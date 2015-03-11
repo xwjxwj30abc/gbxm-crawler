@@ -1,4 +1,4 @@
-package zx.soft.snd.twitter.domain;
+package zx.soft.gbxm.twitter.domain;
 
 public class Token {
 

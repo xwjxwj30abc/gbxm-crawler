@@ -1,4 +1,4 @@
-package zx.soft.snd.twitter.dao;
+package zx.soft.gbxm.twitter.dao;
 
 import java.util.List;
 
@@ -6,9 +6,9 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import zx.soft.snd.twitter.domain.StatusInfo;
-import zx.soft.snd.twitter.domain.Token;
-import zx.soft.snd.twitter.domain.UserInfo;
+import zx.soft.gbxm.twitter.domain.StatusInfo;
+import zx.soft.gbxm.twitter.domain.Token;
+import zx.soft.gbxm.twitter.domain.UserInfo;
 
 public interface TwitterDao {
 
@@ -16,9 +16,6 @@ public interface TwitterDao {
 
 	@Select("SELECT name FROM ${tablename} WHERE id BETWEEN #{from} AND (#{from}+" + (PAGECOUNT - 1) + ")")
 	public List<String> getNameList(@Param("tablename") String tablename, @Param("from") int from);
-
-	/*	@Select("SELECT * FROM ${tablename} WHERE id BETWEEN #{from} AND (#{from}+" + (PAGECOUNT - 1) + ")")
-		public List<Token> getTokenList(@Param("tablename") String tablename, @Param("from") int from);*/
 
 	@Select("SELECT * FROM ${tablename} WHERE id=#{id}")
 	public Token getToken(@Param("tablename") String tablename, @Param("id") long id);

@@ -13,10 +13,10 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;
-import zx.soft.snd.twitter.dao.TwitterDaoImpl;
-import zx.soft.snd.twitter.domain.StatusInfo;
-import zx.soft.snd.twitter.domain.Token;
-import zx.soft.snd.twitter.domain.UserInfo;
+import zx.soft.gbxm.twitter.dao.TwitterDaoImpl;
+import zx.soft.gbxm.twitter.domain.StatusInfo;
+import zx.soft.gbxm.twitter.domain.Token;
+import zx.soft.gbxm.twitter.domain.UserInfo;
 import zx.soft.utils.config.ConfigUtil;
 
 public class TwitterSpider {

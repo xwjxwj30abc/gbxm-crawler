@@ -1,28 +1,35 @@
-<?xml version="1.0" encoding="UTF-8" ?>  
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss:SSS}[%thread] %-5level %logger{5} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
 
-<mapper namespace="zx.soft.snd.twitter.dao.TwitterDao">
+	<appender name="File"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>logs/gbxm-twitter.log</file>
+		<encoder>
+			<pattern>%d{ISO8601} [%thread] %-5level %logger{36} [Line:%-3L] -
+				%msg%n</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>INFO</level>
+		</filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>logs/gbxm-twitter.log.%d{yyyy-MM-dd}.tar.gz
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+	</appender>
 
-	<insert id="insertStatusInfo" parameterType="StatusInfo">
-		INSERT INTO
-		twitterStatusInfos(createdAt,statusId,text,source,favoriteCount,address,countryCode,retweetCount,retweetedStatusId,userId)
-		values(#{createdAt},#{statusId},#{text},#{source},#{favoriteCount},#{address},#{countryCode},#{retweetCount},#{retweetedStatusId},#{userId});
-	</insert>
+	<logger name="zx.soft.log" level="INFO" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="File" />
+	</logger>
 
-	<insert id="insertUserInfo" parameterType="UserInfo">
-		INSERT INTO
-		twitterUserInfos(userId,name,screenName,location,description,url,followersCount,friendsCount,createdAt,favouritesCount,listedCount,lastStatusId,statusesCount)
-		values(#{userId},#{name},#{screenName},#{location},#{description},#{url},#{followersCount},#{friendsCount},#{createdAt},#{favouritesCount},#{listedCount},#{lastStatusId},#{statusesCount});
-	</insert>
-
-	<insert id="insertName" parameterType="String">
-		insert into
-		twitterUserName(name) values(#{name});
-	</insert>
-
-	<insert id="insertToken" parameterType="Token">
-		insert into twitterTokens(tokenkey,tokensecret,sinceId)
-		values(#{tokenkey},#{tokensecret},#{sinceId});
-	</insert>
-
-</mapper>
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration>

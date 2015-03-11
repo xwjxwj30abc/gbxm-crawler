@@ -1,4 +1,4 @@
-package zx.soft.snd.web.utils;
+package zx.soft.gbxm.twitter.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
