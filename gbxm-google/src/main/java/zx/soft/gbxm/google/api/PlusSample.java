@@ -2,13 +2,11 @@ package zx.soft.gbxm.google.api;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import zx.soft.utils.json.JsonUtils;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.DataStoreCredentialRefreshListener;
@@ -45,7 +43,7 @@ public class PlusSample {
 
 	private static Plus plus;
 
-	private static DateTime lastUpdateTime;
+	private static DateTime lastUpdateTime = new DateTime(0);
 
 	private static Credential authorize(String userId) throws IOException {
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(
@@ -57,31 +55,20 @@ public class PlusSample {
 		return new AuthorizationCodeInstalledApp(flow, builder.build()).authorize(userId);
 	}
 
-	public static void main(String[] args) {
-		try {
-			httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-			dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
-			Credential credential = authorize("test");
+	public static void main(String[] args) throws GeneralSecurityException, IOException {
 
-			Date expirationTime = new Date(credential.getExpirationTimeMilliseconds());
-			logger.info("token过期时间：" + credential.getExpirationTimeMilliseconds() + "equal  " + expirationTime);
+		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+		dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
+		Credential credential = authorize("test");
+		plus = new Plus.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
+		listActivities("110924633889503463658");
+		while (true) {
+			updateActivities("110924633889503463658");
+			credential = authorize("test");
 			plus = new Plus.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME)
 					.build();
-			listActivities("110924633889503463658");
-			while (true) {
-				updateActivities("110924633889503463658");
-				Thread.sleep(3 * 60 * 1000);
-				credential = authorize("test");
-				expirationTime = new Date(credential.getExpirationTimeMilliseconds());
-				logger.info("token过期时间：" + expirationTime);
-				plus = new Plus.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME)
-						.build();
-			}
-		} catch (IOException e) {
-			System.err.println(e.getMessage());
-		} catch (Throwable t) {
-			t.printStackTrace();
 		}
+
 	}
 
 	/**
@@ -103,7 +90,7 @@ public class PlusSample {
 			logger.info("currentPageNumber=  " + currentPageNumber);
 			for (Activity activity : feed.getItems()) {
 				logger.info("activity num=  " + i++);
-				logger.info(JsonUtils.toJsonWithoutPretty(activity));
+				View.show(activity);
 			}
 			// 获取下一页
 			String nextPageToken = feed.getNextPageToken();
@@ -137,7 +124,7 @@ public class PlusSample {
 			int i = 1;
 			for (Activity activity : feed.getItems()) {
 				logger.info("activity num=" + i++);
-				logger.info(JsonUtils.toJson(activity));
+				View.show(activity);
 			}
 			String nextPageToken = feed.getNextPageToken();
 			if (nextPageToken == null) {
