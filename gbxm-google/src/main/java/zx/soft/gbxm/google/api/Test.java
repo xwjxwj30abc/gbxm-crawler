@@ -17,8 +17,14 @@ public class Test {
 		String credentialFilePath = ".store/plus_sample";
 		Credential credential = credentialFile.loadCredential(credentialFilePath, "test");
 		System.out.println(credential.getAccessToken());
+		System.out.println(credential.getRefreshToken());
+		System.out.println(credential.getExpiresInSeconds());
+		System.out.println(credential.refreshToken());
+		System.out.println(credential.getAccessToken());
+		System.out.println(credential.getRefreshToken());
+		System.out.println(credential.getExpiresInSeconds());
 		Plus plus = new Plus.Builder(credentialFile.getHttpTransport(), CredentialFile.getJsonFactory(), credential)
-				.setApplicationName("zxsoft crawler").build();
+		.setApplicationName("zxsoft crawler").build();
 		View.header1("Listing  Activities");
 		//获取第一页活动状态信息
 		List listActivities = plus.activities().list("110924633889503463658", "public");
@@ -31,7 +37,7 @@ public class Test {
 		while (feed.getItems() != null && !feed.getItems().isEmpty() && ++currentPageNumber <= 2) {
 			int i = 1;
 			for (Activity activity : feed.getItems()) {
-				View.show(activity);
+				//View.show(activity);
 			}
 			// 获取下一页
 			String nextPageToken = feed.getNextPageToken();

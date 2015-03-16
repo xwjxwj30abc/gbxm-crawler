@@ -1,12 +1,12 @@
 package zx.soft.gbxm.google.domain;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class UserInfo {
 
 	private String userId;
 	private String userName;
-	private Date lastUpdateTime;
+	private Timestamp lastUpdateTime;
 
 	@Override
 	public String toString() {
@@ -29,11 +29,11 @@ public class UserInfo {
 		this.userName = userName;
 	}
 
-	public Date getLastUpdateTime() {
+	public Timestamp getLastUpdateTime() {
 		return lastUpdateTime;
 	}
 
-	public void setLastUpdateTime(Date lastUpdateTime) {
+	public void setLastUpdateTime(Timestamp lastUpdateTime) {
 		this.lastUpdateTime = lastUpdateTime;
 	}
 

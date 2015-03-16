@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.sql.Timestamp;
 import java.util.Collections;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -18,6 +22,7 @@ import com.google.api.services.plus.PlusScopes;
 
 public class CredentialFile {
 
+	private static Logger logger = LoggerFactory.getLogger(CredentialFile.class);
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 	private static FileDataStoreFactory dataStoreFactory;
 	private static File credentialFile;
@@ -34,15 +39,8 @@ public class CredentialFile {
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
 				clientSecrets, Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory).build();
 		Credential credential = flow.loadCredential(userId);
+		logger.info("token 在" + new Timestamp(credential.getExpirationTimeMilliseconds()).toString() + "时候过期");
 		if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
-			if (credential.getRefreshToken() == null) {
-				System.out.println("refresh TOken is null");
-			}
-
-			if (credential.getRefreshListeners() == null) {
-				System.out.println("refresh token listerning is");
-			}
-			System.out.println(credential.getExpiresInSeconds());
 			return credential;
 		}
 		return null;

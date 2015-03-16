@@ -7,11 +7,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import zx.soft.gbxm.google.api.CredentialFile;
+public class CredentialFile {
 
-public class ReadCredentialFile {
-
-	private static Logger logger = LoggerFactory.getLogger(ReadCredentialFile.class);
+	private static Logger logger = LoggerFactory.getLogger(CredentialFile.class);
 
 	public static List<String> getCredentialFileList(String path) {
 

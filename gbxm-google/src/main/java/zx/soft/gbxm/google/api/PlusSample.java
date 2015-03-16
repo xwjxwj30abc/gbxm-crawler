@@ -48,9 +48,11 @@ public class PlusSample {
 	private static Credential authorize(String userId) throws IOException {
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(
 				PlusSample.class.getResourceAsStream("/client_secrets.json")));
+
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
 				clientSecrets, Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory)
-				.addRefreshListener(new DataStoreCredentialRefreshListener(userId, dataStoreFactory)).build();
+				.addRefreshListener(new DataStoreCredentialRefreshListener(userId, dataStoreFactory))
+				.setApprovalPrompt("force").setAccessType("offline").build();
 		Builder builder = new Builder().setHost("localhost").setPort(8080);
 		return new AuthorizationCodeInstalledApp(flow, builder.build()).authorize(userId);
 	}
@@ -68,7 +70,6 @@ public class PlusSample {
 			plus = new Plus.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME)
 					.build();
 		}
-
 	}
 
 	/**

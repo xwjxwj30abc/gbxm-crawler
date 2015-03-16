@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="zx.soft.gbxm.google.dao.GoogleDao">
+
+	<insert id="insertStatusInfo" parameterType="StatusInfo">
+		INSERT INTO
+		googleStatusInfos(statusId,published,url,content,source)
+		values(#{statusId},#{published},#{url},#{content},#{source});
+	</insert>
+
+	<insert id="insertUserInfo" parameterType="UserInfo">
+		INSERT INTO
+		googleUserInfos(userId,userName,lastUpdateTime)
+		values(#{userId},#{userName},#{lastUpdateTime});
+	</insert>
+
+</mapper>

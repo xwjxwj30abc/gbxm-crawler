@@ -1,19 +1,19 @@
 package zx.soft.gbxm.google.domain;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class StatusInfo {
 
 	private String statusId;
-	private Date published;
-	private Date updated;
+	private Timestamp published;
 	private String url;
 	private String content;
+	private String source;
 
 	@Override
 	public String toString() {
-		return "StatusInfo [statusId=" + statusId + ", published=" + published + ", updated=" + updated + ", url="
-				+ url + ", content=" + content + "]";
+		return "StatusInfo [statusId=" + statusId + ", published=" + published + ", url=" + url + ", content="
+				+ content + ", source=" + source + "]";
 	}
 
 	public String getStatusId() {
@@ -24,20 +24,12 @@ public class StatusInfo {
 		this.statusId = statusId;
 	}
 
-	public Date getPublished() {
+	public Timestamp getPublished() {
 		return published;
 	}
 
-	public void setPublished(Date published) {
-		this.published = published;
-	}
-
-	public Date getUpdated() {
-		return updated;
-	}
-
-	public void setUpdated(Date updated) {
-		this.updated = updated;
+	public void setPublished(Timestamp dateTime) {
+		this.published = dateTime;
 	}
 
 	public String getUrl() {
@@ -54,6 +46,14 @@ public class StatusInfo {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 
 }
