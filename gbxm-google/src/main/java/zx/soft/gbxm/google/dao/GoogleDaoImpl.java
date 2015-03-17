@@ -1,6 +1,7 @@
 package zx.soft.gbxm.google.dao;
 
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,18 +76,35 @@ public class GoogleDaoImpl {
 	public boolean isExisted(String tableName, String userId) {
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
-			if (googleDao.getIdByUserId(tableName, userId) == null) {
+			if (googleDao.getNameByUserId(tableName, userId) == null) {
 				return Boolean.FALSE;
 			}
+			return Boolean.TRUE;
 		}
-		return Boolean.TRUE;
 	}
 
-	//更新用户信息
-	public void updatedUserInfo(UserInfo userInfo) {
+	//根据用户Id获取用户名
+	public String getNameByUserId(String tableName, String userId) {
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
-			googleDao.updateUserInfo(userInfo);
+			return googleDao.getNameByUserId(tableName, userId);
+		}
+	}
+
+	//根据用户Id获取上次更新时间
+	public Timestamp getLastUpdateTimeByUserId(String tableName, String userId) {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
+			return googleDao.getLastUpdateTimeByUserId(tableName, userId);
+		}
+	}
+
+	//更新读取用户数据的时间记录
+	public void updatedUserInfo(String userId, Timestamp lastUpdateTime) {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
+			googleDao.updateUserInfo(userId, lastUpdateTime);
+			logger.info("update userInfo");
 		}
 	}
 

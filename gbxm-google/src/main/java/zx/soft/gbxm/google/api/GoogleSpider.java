@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import zx.soft.gbxm.google.dao.GoogleDaoImpl;
 import zx.soft.gbxm.google.domain.StatusInfo;
-import zx.soft.gbxm.google.domain.UserInfo;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.plus.Plus;
@@ -25,30 +25,36 @@ public class GoogleSpider {
 		String credentialFilePath = ".store/plus_sample";
 		Credential credential = credentialFile.loadCredential(credentialFilePath, "test");
 		Plus plus = new Plus.Builder(credentialFile.getHttpTransport(), CredentialFile.getJsonFactory(), credential)
-				.setApplicationName("zxsoft crawler").build();
+		.setApplicationName("zxsoft crawler").build();
 		ActivityList activityList = new ActivityList(plus);
 		ArrayList<StatusInfo> statusInfos = new ArrayList<>();
-		String userId = "110924633889503463658";
+		String userInfoTableName = "googleUserInfos";
 		while (true) {
-			long currentTime = System.currentTimeMillis() - 17200_000;
-			statusInfos = activityList.getActivitiesByUserId(userId, currentTime);
-			logger.info("activities length=" + statusInfos.size());
-			googleDaoImpl.insertStatusInfo(statusInfos);
-			UserInfo userInfo = new UserInfo();
-			userInfo.setUserId(userId);
-			userInfo.setUserName("hjhj");
-			userInfo.setLastUpdateTime(new Timestamp(currentTime));
-			if (googleDaoImpl.isExisted("googleUserInfos", userId)) {
-				googleDaoImpl.updatedUserInfo(userInfo);
-			} else {
-				googleDaoImpl.insertUserInfo(userInfo);
+			List<String> userIdList = googleDaoImpl.getUserIdList(userInfoTableName);
+			logger.info("待更新用户数量" + userIdList.size());
+			long currentTime = System.currentTimeMillis();
+			long lastUpdateTme = 0;
+			for (String userId : userIdList) {
+				logger.info("get current userId=" + userId);
+				lastUpdateTme = googleDaoImpl.getLastUpdateTimeByUserId(userInfoTableName, userId).getTime();
+				statusInfos = activityList.getActivitiesByUserId(userId, lastUpdateTme);
+				logger.info("activities length=" + statusInfos.size());
+				googleDaoImpl.insertStatusInfo(statusInfos);
+				if (googleDaoImpl.isExisted(userInfoTableName, userId)) {
+					googleDaoImpl.updatedUserInfo(userId, new Timestamp(currentTime));
+				}
 			}
 			long spendTime = System.currentTimeMillis() - currentTime;
-			Thread.sleep(currentTime + 3000_000 - spendTime);
+			//logger.info("开始睡眠" + (3000_000 - spendTime) + "毫秒");
+			//Thread.sleep(3000_000 - spendTime);
+			logger.info("开始睡眠10秒");
+			Thread.sleep(10_000);
+			logger.info("睡眠结束");
 			if (credential.refreshToken()) {
 				plus = new Plus.Builder(credentialFile.getHttpTransport(), CredentialFile.getJsonFactory(), credential)
-						.setApplicationName("zxsoft crawler").build();
+				.setApplicationName("zxsoft crawler").build();
 				activityList.setPlus(plus);
+				logger.info("进行token更新");
 			}
 		}
 	}

@@ -32,6 +32,7 @@ public class ActivityList {
 		int currentPageNumber = 0;
 
 		while (feed.getItems() != null && !feed.getItems().isEmpty() && ++currentPageNumber <= 2) {
+			logger.info("currentPageCount=" + currentPageNumber);
 			if (feed.getItems().get(0).getPublished().getValue() <= lastUpdatedTime) {
 				break;
 			}

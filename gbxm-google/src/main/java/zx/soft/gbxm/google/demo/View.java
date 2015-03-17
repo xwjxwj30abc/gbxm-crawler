@@ -1,4 +1,4 @@
-package zx.soft.gbxm.google.api;
+package zx.soft.gbxm.google.demo;
 
 //package com.google.api.services.samples.plus.cmdline;
 

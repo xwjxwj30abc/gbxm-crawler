@@ -30,12 +30,12 @@ public class CredentialFile {
 	private static HttpTransport httpTransport;
 
 	public Credential loadCredential(String credentialFilePath, String userId) throws IOException,
-	GeneralSecurityException {
+			GeneralSecurityException {
 		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		credentialFile = new File(System.getProperty("user.home"), credentialFilePath);
 		dataStoreFactory = new FileDataStoreFactory(credentialFile);
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(
-				PlusSample.class.getResourceAsStream("/client_secrets.json")));
+				CredentialFile.class.getResourceAsStream("/client_secrets.json")));
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
 				clientSecrets, Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory).build();
 		Credential credential = flow.loadCredential(userId);

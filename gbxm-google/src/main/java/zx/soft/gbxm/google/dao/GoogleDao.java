@@ -1,5 +1,6 @@
 package zx.soft.gbxm.google.dao;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -14,17 +15,20 @@ public interface GoogleDao {
 	@Select("SELECT max(id) FROM ${tableName}")
 	public int getTableCount(String tableName);
 
-	@Update("update googleUserInfos set userId=#{userInfo.userId},userName={userInfo.userName},"
-			+ "lastUpdateTime={userInfo.lastUpdateTime} where userId={userInfo.userId}")
-	public void updateUserInfo(@Param("UserInfo") UserInfo userInfo);
+	@Update("UPDATE `googleUserInfos` SET `lastUpdateTime`=#{lastUpdateTime} WHERE `userId`=#{userId}")
+	public void updateUserInfo(@Param("userId") String userId, @Param("lastUpdateTime") Timestamp lastUpdateTime);
 
-	@Select("SELECT 'id' FROM ${tableName} WHERE  'userId'=#{userId}")
-	public String getIdByUserId(@Param("tableName") String tableName, @Param("userId") String userId);
+	@Select("SELECT `userName` FROM ${tableName} WHERE `userId`=#{userId}")
+	public String getNameByUserId(@Param("tableName") String tableName, @Param("userId") String userId);
 
-	@Select("SELECT 'userId' from ${tableName}")
+	@Select("SELECT `lastUpdateTime` FROM ${tableName} WHERE `userId`=#{userId}")
+	public Timestamp getLastUpdateTimeByUserId(@Param("tableName") String tableName, @Param("userId") String userId);
+
+	@Select("SELECT `userId` from ${tableName}")
 	public List<String> getAllUserId(@Param("tableName") String tableName);
 
 	public void insertStatusInfo(StatusInfo statusInfo);
 
 	public void insertUserInfo(UserInfo userInfo);
+
 }
