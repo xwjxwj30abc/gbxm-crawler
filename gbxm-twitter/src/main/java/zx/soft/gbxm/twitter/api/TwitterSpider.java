@@ -18,11 +18,15 @@ import zx.soft.gbxm.twitter.domain.StatusInfo;
 import zx.soft.gbxm.twitter.domain.Token;
 import zx.soft.gbxm.twitter.domain.UserInfo;
 import zx.soft.utils.config.ConfigUtil;
+import zx.soft.utils.http.RestletClientDaoImpl;
+import zx.soft.utils.json.JsonUtils;
 
 public class TwitterSpider {
 
 	private static Logger logger = LoggerFactory.getLogger(TwitterSpider.class);
 	private static TwitterDaoImpl twitterDaoImpl = new TwitterDaoImpl();
+	private static RestletClientDaoImpl restletClientDaoImpl = new RestletClientDaoImpl();
+	private static final String URL = "http://192.168.31.12:8900/sentiment/index";
 	static int i = 0;
 
 	public int run(Follows follows) throws InterruptedException, TwitterException {
@@ -45,6 +49,7 @@ public class TwitterSpider {
 					statusInfo.setRetweetedStatusId(status.getRetweetedStatus().getId());
 				}
 				statusInfo.setUserId(status.getUser().getId());
+				System.out.println(restletClientDaoImpl.doPost(URL, JsonUtils.toJson(statusInfo)));
 				statusInfos.add(statusInfo);
 
 				UserInfo userInfo = new UserInfo();
@@ -76,7 +81,8 @@ public class TwitterSpider {
 			}
 			statuses = null;
 			twitterDaoImpl.insertStatusInfo(statusInfos);
-			logger.info("insert statusInfo" + statusInfos.size());
+			//System.out.println(restletClientDaoImpl.doPost(URL, JsonUtils.toJson(statusInfos)));
+			//logger.info("insert statusInfo" + statusInfos.size());
 			//同时更新sinceId
 			twitterDaoImpl.updateSinceId(statusInfos.get(0).getStatusId(), i);
 		}
