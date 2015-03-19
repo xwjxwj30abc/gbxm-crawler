@@ -2,17 +2,18 @@ package zx.soft.gbxm.google.api;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import zx.soft.utils.config.ConfigUtil;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -26,18 +27,25 @@ public class CredentialFile {
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 	private static FileDataStoreFactory dataStoreFactory;
 	private static File credentialFile;
-
+	private static Properties props = ConfigUtil.getProps("client_secrets.properties");
 	private static HttpTransport httpTransport;
 
-	public Credential loadCredential(String credentialFilePath, String userId) throws IOException,
+	/**
+	 * 根据文件名获取该应用的credentials文件中指定授权用户的credentail
+	 * @param credentialFilename
+	 * @param userId
+	 * @return Credential
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 */
+	public Credential loadCredential(String credentialFilename, String userId) throws IOException,
 			GeneralSecurityException {
 		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-		credentialFile = new File(System.getProperty("user.home"), credentialFilePath);
+		credentialFile = new File(props.getProperty("credential_path") + credentialFilename);
 		dataStoreFactory = new FileDataStoreFactory(credentialFile);
-		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(
-				CredentialFile.class.getResourceAsStream("/client_secrets.json")));
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
-				clientSecrets, Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory).build();
+				props.getProperty("client_id"), props.getProperty("client_secret"),
+				Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory).build();
 		Credential credential = flow.loadCredential(userId);
 		logger.info("token 在" + new Timestamp(credential.getExpirationTimeMilliseconds()).toString() + "时候过期");
 		if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {

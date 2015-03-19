@@ -4,11 +4,11 @@ import java.sql.Timestamp;
 
 public class StatusInfo {
 
-	private String statusId;
-	private Timestamp published;
-	private String url;
-	private String content;
-	private String source;
+	private String statusId;//状态id
+	private Timestamp published;//状态发布时间
+	private String url;//状态对应的url
+	private String content;//具体状态内容
+	private String source;//标记该状态的来源即发布该状态的用户id
 
 	@Override
 	public String toString() {
