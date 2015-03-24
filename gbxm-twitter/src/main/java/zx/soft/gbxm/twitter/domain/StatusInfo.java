@@ -4,7 +4,7 @@ public class StatusInfo {
 
 	private long id;
 	private long userId;
-	private String username;
+	private String username = "";
 	private long retweetedStatusId;
 	private long retweetedUserId;
 	private String retweetedUserName = "";

@@ -3,11 +3,6 @@
 
 <mapper namespace="zx.soft.gbxm.twitter.dao.TwitterDao">
 
-	<!-- <insert id="insertStatusInfo" parameterType="StatusInfo">
-		INSERT INTO
-		twitterStatusInfos(createdAt,statusId,text,source,favoriteCount,address,countryCode,retweetCount,retweetedStatusId,userId)
-		values(#{createdAt},#{statusId},#{text},#{source},#{favoriteCount},#{address},#{countryCode},#{retweetCount},#{retweetedStatusId},#{userId});
-	</insert> -->
 	<insert id="insertStatusInfo" parameterType="StatusInfo">
 		INSERT INTO
 		twitterStatusInfo(id,user_id,username,retweeted_status_id,retweeteed_user_id,retweeted_user_name,text,favorite_count,retweeted_count,created_at,placename,lasttime)
