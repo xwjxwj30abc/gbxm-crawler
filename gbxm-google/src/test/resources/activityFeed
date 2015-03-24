@@ -1,0 +1,23 @@
+{
+  "kind": "plus#activityFeed",
+  "etag": etag,
+  "nextPageToken": string,
+  "selfLink": string,
+  "nextLink": string,
+  "title": string,
+  "updated": datetime,
+  "id": string,
+  "items": [
+    activities Resource
+  ]
+}
+
+kind	string	确定此资源是动态集合。值：“plus#activityFeed”。	
+nextPageToken	string	延续令牌，用于逐页浏览页数较多的结果集合。在后续请求中提供此值以返回下一页结果。	
+selfLink	string	指向此动态资源的链接。	
+nextLink	string	指向下一页动态的链接。	
+title	string	此动态集合的标题。	
+updated	datetime	此动态集合最后一次更新的时间，格式采用 RFC 3339 时间戳。	
+id	string	此动态集合的 ID。已弃用。	
+items[]	list	此结果页面中的动态。	
+etag	etag	此响应的 ETag（用于缓存目的）。

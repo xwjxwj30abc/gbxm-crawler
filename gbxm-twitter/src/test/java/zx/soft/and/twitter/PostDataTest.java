@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.Response;
 import org.restlet.data.MediaType;
@@ -18,6 +19,7 @@ import zx.soft.utils.json.JsonUtils;
 
 public class PostDataTest {
 
+	@Ignore
 	@Test
 	public void testPostData() throws IOException {
 

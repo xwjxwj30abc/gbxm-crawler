@@ -10,6 +10,7 @@ import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,8 @@ public class TwitterSpider {
 					record.setOriginal_uid(Long.toString(status.getRetweetedStatus().getUser().getId())); //原创用户id
 					record.setOriginal_name(status.getRetweetedStatus().getUser().getName()); //原创用户昵称
 					statusInfo.setRetweetedStatusId(status.getRetweetedStatus().getId());
+					statusInfo.setRetweetedUserId(status.getRetweetedStatus().getUser().getId());
+					statusInfo.setRetweetedUserName(status.getRetweetedStatus().getUser().getName());
 				}
 				record.setUrl(url);//url
 				record.setContent(status.getText()); //该记录内容
@@ -70,17 +73,15 @@ public class TwitterSpider {
 				record.setFirst_time(currentTime); //first_time
 				if (status.getPlace() != null) {
 					record.setLocation(status.getPlace().getFullName());//该记录发布的地理位置信息
-					statusInfo.setAddress(status.getPlace().getFullName());
-					statusInfo.setCountryCode(status.getPlace().getCountryCode());
+					statusInfo.setPlacename(status.getPlace().getFullName());
 				}
-
-				statusInfo.setCreatedAt(status.getCreatedAt());
-				statusInfo.setStatusId(status.getId());
+				statusInfo.setId(status.getId());
+				statusInfo.setUserId(status.getUser().getId());
+				statusInfo.setUsername(status.getUser().getName());
 				statusInfo.setText(status.getText());
-				statusInfo.setSource(status.getSource());
 				statusInfo.setFavoriteCount(status.getFavoriteCount());
 				statusInfo.setRetweetCount(status.getRetweetCount());
-				statusInfo.setUserId(status.getUser().getId());
+				statusInfo.setCreatedAt(Long.toString(status.getCreatedAt().getTime()));
 
 				records.add(record);
 				statusInfos.add(statusInfo);
@@ -117,15 +118,16 @@ public class TwitterSpider {
 			postData.setRecords(records);
 			Representation entity = new StringRepresentation(JsonUtils.toJsonWithoutPretty(postData));
 			entity.setMediaType(MediaType.APPLICATION_JSON);
-			Representation representation = clientResource.post(entity);
-			logger.info("post return " + representation.toString());
-			Response response = clientResource.getResponse();
 			try {
-				logger.info(response.getEntity().getText());
-			} catch (IOException e) {
+				Representation representation = clientResource.post(entity);
+				logger.info("post return " + representation.toString());
+				Response response = clientResource.getResponse();
+				logger.info(response.getEntityAsText());
+			} catch (ResourceException e) {
+				logger.error("post data to solr error ,now store data to mysql ");
 				logger.error(e.getMessage());
+				twitterDaoImpl.insertStatusInfo(statusInfos);
 			}
-			twitterDaoImpl.insertStatusInfo(statusInfos);
 			//同时更新sinceId
 			twitterDaoImpl.updateSinceId(statusInfos.get(0).getStatusId(), i);
 		}

@@ -43,7 +43,7 @@ public class GoogleDaoImpl {
 					logger.info("insert  " + statusInfo.toString() + " succeed.");
 				} catch (Exception e) {
 					try {
-						statusInfo.setContent(new String(statusInfo.getContent().getBytes(), "GBK"));
+						statusInfo.setObjectContent(new String(statusInfo.getObjectContent().getBytes(), "GBK"));
 						googleDao.insertStatusInfo(statusInfo);
 					} catch (UnsupportedEncodingException e1) {
 						e1.printStackTrace();
@@ -108,4 +108,12 @@ public class GoogleDaoImpl {
 		}
 	}
 
+	public static void main(String[] args) {
+		GoogleDaoImpl googleDaoImpl = new GoogleDaoImpl();
+		StatusInfo statusInfo = new StatusInfo();
+		List<StatusInfo> statusInfoes = new ArrayList<>();
+		statusInfo.setPublished(new Timestamp(System.currentTimeMillis()));
+		statusInfoes.add(statusInfo);
+		googleDaoImpl.insertStatusInfo(statusInfoes);
+	}
 }

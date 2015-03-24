@@ -1,4 +1,4 @@
-package zx.soft.gbxm.twitter.domain;
+package zx.soft.gbxm.google.domain;
 
 public class RecordInfo {
 	private String id = "";
@@ -26,7 +26,7 @@ public class RecordInfo {
 	private String pic_url = "";
 	private String voice_url = "";
 	private long timestamp;
-	private int source_id = 584;
+	private int source_id = 1668;
 	private long lasttime;
 	private int server_id;
 	private long identify_id;
@@ -40,7 +40,7 @@ public class RecordInfo {
 	private String receive_addr = "";
 	private String append_addr = "";
 	private String send_addr = "";
-	private String source_name = "twitter";
+	private String source_name = "google plus";
 	private int source_type;
 	private int country_code = 0;
 	private int location_code;
