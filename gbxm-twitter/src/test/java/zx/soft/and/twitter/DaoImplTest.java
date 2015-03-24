@@ -1,5 +1,4 @@
-package zx.soft.and.twitter.dao;
-
+package zx.soft.and.twitter;
 
 public class DaoImplTest {
 

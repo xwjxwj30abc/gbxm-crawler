@@ -3,6 +3,7 @@ package zx.soft.gbxm.twitter.domain;
 import java.util.Date;
 
 public class StatusInfo {
+
 	private Date createdAt;//该微博创建时间
 	private long statusId;//该微博id
 	private String text;//该微博的文本信息
@@ -12,7 +13,7 @@ public class StatusInfo {
 	private String countryCode = "";//国家编码
 	private long retweetCount = 0;//该微博总的转发数量
 	private long retweetedStatusId = 0L;//返回转发的微博id
-	private long userId;
+	private long userId;//发表该状态的用户id
 
 	public StatusInfo() {
 		//

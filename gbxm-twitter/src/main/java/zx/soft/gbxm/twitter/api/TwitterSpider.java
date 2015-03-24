@@ -1,9 +1,15 @@
 package zx.soft.gbxm.twitter.api;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.restlet.Response;
+import org.restlet.data.MediaType;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.ClientResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,42 +20,69 @@ import twitter4j.TwitterFactory;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;
 import zx.soft.gbxm.twitter.dao.TwitterDaoImpl;
+import zx.soft.gbxm.twitter.domain.PostData;
+import zx.soft.gbxm.twitter.domain.RecordInfo;
 import zx.soft.gbxm.twitter.domain.StatusInfo;
 import zx.soft.gbxm.twitter.domain.Token;
 import zx.soft.gbxm.twitter.domain.UserInfo;
+import zx.soft.utils.checksum.CheckSumUtils;
 import zx.soft.utils.config.ConfigUtil;
-import zx.soft.utils.http.RestletClientDaoImpl;
 import zx.soft.utils.json.JsonUtils;
 
 public class TwitterSpider {
 
 	private static Logger logger = LoggerFactory.getLogger(TwitterSpider.class);
 	private static TwitterDaoImpl twitterDaoImpl = new TwitterDaoImpl();
-	private static RestletClientDaoImpl restletClientDaoImpl = new RestletClientDaoImpl();
-	private static final String URL = "http://192.168.31.12:8900/sentiment/index";
+	private static final String URL = "http://36.7.150.150:18900/sentiment/index";
+	private final ClientResource clientResource = new ClientResource(URL);
 	static int i = 0;
 
 	public int run(Follows follows) throws InterruptedException, TwitterException {
+
 		List<StatusInfo> statusInfos = new ArrayList<>();
+		PostData postData = new PostData();
+		List<RecordInfo> records = new ArrayList<>();
 		List<Status> statuses = follows.getHomeTimeLine();
 		if (statuses.size() != 0) {
 			for (Status status : statuses) {
 				StatusInfo statusInfo = new StatusInfo();
+				RecordInfo record = new RecordInfo();
+				String url = "https://twitter.com/" + status.getUser().getName() + "/status/" + status.getId();
+				record.setId(CheckSumUtils.getMD5(url).toUpperCase());//状态id,用户id进行MD5加密
+				record.setMid(Long.toString(status.getId()));//主id
+				record.setUsername(Long.toString(status.getUser().getId())); //用户id
+				record.setNickname(status.getUser().getName()); //用户昵称
+
+				if (status.getRetweetedStatus() != null) {
+					record.setOriginal_id(Long.toString(status.getRetweetedStatus().getId())); //原创记录id
+					record.setOriginal_uid(Long.toString(status.getRetweetedStatus().getUser().getId())); //原创用户id
+					record.setOriginal_name(status.getRetweetedStatus().getUser().getName()); //原创用户昵称
+					statusInfo.setRetweetedStatusId(status.getRetweetedStatus().getId());
+				}
+				record.setUrl(url);//url
+				record.setContent(status.getText()); //该记录内容
+				record.setFavorite_count(status.getFavoriteCount()); //收藏数
+				record.setRepost_count(status.getRetweetCount());//转发数
+				record.setTimestamp(status.getCreatedAt().getTime());//该记录发布时间
+				long currentTime = System.currentTimeMillis();
+				record.setLasttime(currentTime);//lasttime
+				record.setUpdate_time(currentTime); //update_time
+				record.setFirst_time(currentTime); //first_time
+				if (status.getPlace() != null) {
+					record.setLocation(status.getPlace().getFullName());//该记录发布的地理位置信息
+					statusInfo.setAddress(status.getPlace().getFullName());
+					statusInfo.setCountryCode(status.getPlace().getCountryCode());
+				}
+
 				statusInfo.setCreatedAt(status.getCreatedAt());
 				statusInfo.setStatusId(status.getId());
 				statusInfo.setText(status.getText());
 				statusInfo.setSource(status.getSource());
 				statusInfo.setFavoriteCount(status.getFavoriteCount());
-				if (status.getPlace() != null) {
-					statusInfo.setAddress(status.getPlace().getFullName());
-					statusInfo.setCountryCode(status.getPlace().getCountry());
-				}
 				statusInfo.setRetweetCount(status.getRetweetCount());
-				if (status.getRetweetedStatus() != null) {
-					statusInfo.setRetweetedStatusId(status.getRetweetedStatus().getId());
-				}
 				statusInfo.setUserId(status.getUser().getId());
-				System.out.println(restletClientDaoImpl.doPost(URL, JsonUtils.toJson(statusInfo)));
+
+				records.add(record);
 				statusInfos.add(statusInfo);
 
 				UserInfo userInfo = new UserInfo();
@@ -80,9 +113,19 @@ public class TwitterSpider {
 				}
 			}
 			statuses = null;
+			postData.setNum(records.size());
+			postData.setRecords(records);
+			Representation entity = new StringRepresentation(JsonUtils.toJsonWithoutPretty(postData));
+			entity.setMediaType(MediaType.APPLICATION_JSON);
+			Representation representation = clientResource.post(entity);
+			logger.info("post return " + representation.toString());
+			Response response = clientResource.getResponse();
+			try {
+				logger.info(response.getEntity().getText());
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+			}
 			twitterDaoImpl.insertStatusInfo(statusInfos);
-			//System.out.println(restletClientDaoImpl.doPost(URL, JsonUtils.toJson(statusInfos)));
-			//logger.info("insert statusInfo" + statusInfos.size());
 			//同时更新sinceId
 			twitterDaoImpl.updateSinceId(statusInfos.get(0).getStatusId(), i);
 		}
@@ -104,7 +147,7 @@ public class TwitterSpider {
 		return twitterDaoImpl.getTableCount("twitterTokens");
 	}
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 		Twitter twitter = new TwitterFactory().getInstance();
 		Properties prop = ConfigUtil.getProps("oauthconsumer.properties");
 		twitter.setOAuthConsumer(prop.getProperty("consumerKey"), prop.getProperty("consumerSecret"));

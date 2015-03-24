@@ -1,5 +1,7 @@
 package zx.soft.gbxm.twitter.driver;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +20,9 @@ public class TwitterSpiderDriver {
 	/**
 	 * 主函数
 	 * @throws InterruptedException
+	 * @throws IOException
 	 */
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 
 		if (args.length == 0) {
 			System.err.println("Usage: Driver <class-name>");
