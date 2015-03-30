@@ -4,8 +4,6 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 <typeAliases>
-<typeAlias type="zx.soft.gbxm.twitter.domain.StatusInfo" alias="StatusInfo"/>
-<typeAlias type="zx.soft.gbxm.twitter.domain.UserInfo" alias="UserInfo"/>
 <typeAlias type="zx.soft.gbxm.twitter.domain.Token" alias="Token"/>
 </typeAliases>
 	<environments default="development">
@@ -14,9 +12,9 @@
 			<dataSource type="POOLED">
 				<property name="driver" value="com.mysql.jdbc.Driver" />
 				<property name="url"
-					value="jdbc:mysql://192.168.6.120:3306/sentimentsearch?useUnicode=true&amp;characterEncoding=utf-8" />
-				<property name="username" value="xuwenjuan" />
-				<property name="password" value="xuwenjuan" />
+					value="jdbc:mysql://54.64.136.101:3306/gbxm?useUnicode=true&amp;characterEncoding=utf-8" />
+				<property name="username" value="gbxm" />
+				<property name="password" value="HrbfvA9VsuFzCySDESgXIg==" />
 				<property name="driver.encoding" value="utf-8" />
 			</dataSource>
 		</environment>

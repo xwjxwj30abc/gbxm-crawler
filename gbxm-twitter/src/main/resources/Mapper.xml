@@ -3,27 +3,4 @@
 
 <mapper namespace="zx.soft.gbxm.twitter.dao.TwitterDao">
 
-	<insert id="insertStatusInfo" parameterType="StatusInfo">
-		INSERT INTO
-		twitterStatusInfo(id,user_id,username,retweeted_status_id,retweeteed_user_id,retweeted_user_name,text,favorite_count,retweeted_count,created_at,placename,lasttime)
-		values(#{id},#{userId},#{username},#{retweetedStatusId},#{retweetedUserId},#{retweetedUserName},
-		#{text},#{favoriteCount},#{retweetCount},#{createdAt},#{placename},now());
-	</insert>
-
-	<insert id="insertUserInfo" parameterType="UserInfo">
-		INSERT INTO
-		twitterUserInfos(userId,name,screenName,location,description,url,followersCount,friendsCount,createdAt,favouritesCount,listedCount,lastStatusId,statusesCount)
-		values(#{userId},#{name},#{screenName},#{location},#{description},#{url},#{followersCount},#{friendsCount},#{createdAt},#{favouritesCount},#{listedCount},#{lastStatusId},#{statusesCount});
-	</insert>
-
-	<insert id="insertName" parameterType="String">
-		insert into
-		twitterUserName(name) values(#{name});
-	</insert>
-
-	<insert id="insertToken" parameterType="Token">
-		insert into twitterTokens(tokenkey,tokensecret,sinceId)
-		values(#{tokenkey},#{tokensecret},#{sinceId});
-	</insert>
-
 </mapper>

@@ -23,9 +23,8 @@ import twitter4j.auth.AccessToken;
 import zx.soft.gbxm.twitter.dao.TwitterDaoImpl;
 import zx.soft.gbxm.twitter.domain.PostData;
 import zx.soft.gbxm.twitter.domain.RecordInfo;
-import zx.soft.gbxm.twitter.domain.StatusInfo;
 import zx.soft.gbxm.twitter.domain.Token;
-import zx.soft.gbxm.twitter.domain.UserInfo;
+import zx.soft.model.user.TwitterUser;
 import zx.soft.utils.checksum.CheckSumUtils;
 import zx.soft.utils.config.ConfigUtil;
 import zx.soft.utils.json.JsonUtils;
@@ -34,104 +33,124 @@ public class TwitterSpider {
 
 	private static Logger logger = LoggerFactory.getLogger(TwitterSpider.class);
 	private static TwitterDaoImpl twitterDaoImpl = new TwitterDaoImpl();
-	private static final String URL = "http://36.7.150.150:18900/sentiment/index";
+	private static final String URL = "http://36.7.150.150:18900/persist";
 	private final ClientResource clientResource = new ClientResource(URL);
 	static int i = 0;
 
 	public int run(Follows follows) throws InterruptedException, TwitterException {
 
-		List<StatusInfo> statusInfos = new ArrayList<>();
+		List<TwitterStatus> twitterStatuses = new ArrayList<>();
 		PostData postData = new PostData();
 		List<RecordInfo> records = new ArrayList<>();
 		List<Status> statuses = follows.getHomeTimeLine();
 		if (statuses.size() != 0) {
 			for (Status status : statuses) {
-				StatusInfo statusInfo = new StatusInfo();
-				RecordInfo record = new RecordInfo();
-				String url = "https://twitter.com/" + status.getUser().getName() + "/status/" + status.getId();
-				record.setId(CheckSumUtils.getMD5(url).toUpperCase());//状态id,用户id进行MD5加密
-				record.setMid(Long.toString(status.getId()));//主id
-				record.setUsername(Long.toString(status.getUser().getId())); //用户id
-				record.setNickname(status.getUser().getName()); //用户昵称
+				TwitterStatus twitterStatus = new TwitterStatus();
 
-				if (status.getRetweetedStatus() != null) {
-					record.setOriginal_id(Long.toString(status.getRetweetedStatus().getId())); //原创记录id
-					record.setOriginal_uid(Long.toString(status.getRetweetedStatus().getUser().getId())); //原创用户id
-					record.setOriginal_name(status.getRetweetedStatus().getUser().getName()); //原创用户昵称
-					statusInfo.setRetweetedStatusId(status.getRetweetedStatus().getId());
-					statusInfo.setRetweetedUserId(status.getRetweetedStatus().getUser().getId());
-					statusInfo.setRetweetedUserName(status.getRetweetedStatus().getUser().getName());
+				twitterStatus.setId(status.getId());
+				twitterStatus.setUser_id(status.getUser().getId());
+				twitterStatus.setScreen_name(status.getUser().getScreenName());
+
+				if (status.getGeoLocation() != null) {
+					twitterStatus.setLatitude(status.getGeoLocation().getLatitude());
+					twitterStatus.setLongitude(status.getGeoLocation().getLongitude());
 				}
+
+				twitterStatus.setCreated_at(status.getCreatedAt().toString());
+				twitterStatus.setText(status.getText());
+				twitterStatus.setRetweet_count(status.getRetweetCount());
+				twitterStatus.setPossibly_sensitive(status.isPossiblySensitive());
+				if (status.getPlace() != null) {
+					twitterStatus.setLocation(status.getPlace().getFullName());
+				}
+				if (status.getRetweetedStatus() != null) {
+					twitterStatus.setRetweeted_id(status.getRetweetedStatus().getId());
+					twitterStatus.setRetweeted_user_id(status.getRetweetedStatus().getUser().getId());
+					twitterStatus.setRetweeted_screen_name(status.getRetweetedStatus().getUser().getScreenName());
+				}
+				twitterStatuses.add(twitterStatus);
+
+				RecordInfo record = new RecordInfo();
+				String url = "https://twitter.com/" + status.getUser().getName() + "/status/" + twitterStatus.getId();
+				record.setId(CheckSumUtils.getMD5(url).toUpperCase());//状态id,用户id进行MD5加密
+				record.setMid(Long.toString(twitterStatus.getId()));//主id
+				record.setUsername(twitterStatus.getUser_id() + ""); // uid
+				record.setNickname(twitterStatus.getScreen_name()); //用户昵称
+				record.setOriginal_id(Long.toString(twitterStatus.getRetweeted_id())); //原创记录id
+				record.setOriginal_uid(Long.toString(twitterStatus.getRetweeted_user_id())); //原创用户id
+				record.setOriginal_name(twitterStatus.getRetweeted_screen_name()); //原创用户昵称
 				record.setUrl(url);//url
-				record.setContent(status.getText()); //该记录内容
-				record.setFavorite_count(status.getFavoriteCount()); //收藏数
-				record.setRepost_count(status.getRetweetCount());//转发数
+				record.setContent(twitterStatus.getText()); //该记录内容
+				record.setRepost_count(twitterStatus.getRetweet_count());//转发数
 				record.setTimestamp(status.getCreatedAt().getTime());//该记录发布时间
 				long currentTime = System.currentTimeMillis();
 				record.setLasttime(currentTime);//lasttime
 				record.setUpdate_time(currentTime); //update_time
 				record.setFirst_time(currentTime); //first_time
-				if (status.getPlace() != null) {
-					record.setLocation(status.getPlace().getFullName());//该记录发布的地理位置信息
-					statusInfo.setPlacename(status.getPlace().getFullName());
-				}
-				statusInfo.setId(status.getId());
-				statusInfo.setUserId(status.getUser().getId());
-				statusInfo.setUsername(status.getUser().getName());
-				statusInfo.setText(status.getText());
-				statusInfo.setFavoriteCount(status.getFavoriteCount());
-				statusInfo.setRetweetCount(status.getRetweetCount());
-				statusInfo.setCreatedAt(Long.toString(status.getCreatedAt().getTime()));
-
+				record.setLocation(twitterStatus.getLocation());//该记录发布的地理位置信息
 				records.add(record);
-				statusInfos.add(statusInfo);
 
-				UserInfo userInfo = new UserInfo();
+				TwitterUser twitterUser = new TwitterUser();
 				User user = status.getUser();
-				userInfo.setUserId(user.getId());
-				userInfo.setName(user.getName());
-				userInfo.setScreenName(user.getScreenName());
-				userInfo.setLocation(user.getLocation());
-				if (user.getDescription() != null) {
-					userInfo.setDescription(user.getDescription());
+				twitterUser.setId(user.getId());
+				twitterUser.setName(user.getName());
+				if (user.getScreenName() != null) {
+					twitterUser.setScreen_name(user.getScreenName());
 				}
+				if (user.getProfileImageURL() != null) {
+					twitterUser.setProfile_image_url(user.getProfileImageURL());
+				}
+				twitterUser.setCreated_at(user.getCreatedAt().toString());
+				twitterUser.setLocation(user.getLocation());
 				if (user.getURL() != null) {
-					userInfo.setUrl(user.getURL());
+					twitterUser.setUrl(user.getURL());
 				}
-				userInfo.setFollowersCount(user.getFollowersCount());
-				userInfo.setFriendsCount(user.getFriendsCount());
-				userInfo.setCreatedAt(user.getCreatedAt());
-				userInfo.setFavouritesCount(user.getFavouritesCount());
-				userInfo.setListedCount(user.getListedCount());
-				if (user.getStatus() != null) {
-					userInfo.setLastStatusId(user.getStatus().getId());
+				twitterUser.setFavourites_count(user.getFavouritesCount());
+				twitterUser.setUtc_offset(user.getUtcOffset());
+				twitterUser.setListed_count(user.getListedCount());
+				twitterUser.setFollowers_count(user.getFollowersCount());
+				twitterUser.setLang(user.getLang());
+				if (user.getDescription() != null) {
+					twitterUser.setDescription(user.getDescription());
 				}
-				userInfo.setStatusesCount(user.getStatusesCount());
-				if (twitterDaoImpl.isUserExisted("twitterUserInfos", userInfo.getUserId())) {
-					twitterDaoImpl.updateUserInfos(userInfo);
+				twitterUser.setVerified(user.isVerified());
+				if (user.getTimeZone() != null) {
+					twitterUser.setTime_zone(user.getTimeZone());
+				}
+				twitterUser.setStatuses_count(user.getStatusesCount());
+				twitterUser.setFriends_count(user.getFriendsCount());
+
+				if (twitterDaoImpl.isUserExisted("user_info_twitter", twitterUser.getId())) {
+					twitterDaoImpl.updateTwitterUser(twitterUser);
 				} else {
-					twitterDaoImpl.insertUserInfo(userInfo);
+					twitterDaoImpl.insertTwitterUser(twitterUser);
 				}
 			}
 			statuses = null;
 			postData.setNum(records.size());
+			logger.info("post data number=" + records.size());
 			postData.setRecords(records);
+			System.out.println(JsonUtils.toJsonWithoutPretty(postData));
 			Representation entity = new StringRepresentation(JsonUtils.toJsonWithoutPretty(postData));
 			entity.setMediaType(MediaType.APPLICATION_JSON);
 			try {
 				Representation representation = clientResource.post(entity);
 				logger.info("post return " + representation.toString());
 				Response response = clientResource.getResponse();
-				logger.info(response.getEntityAsText());
+				try {
+					logger.info(response.getEntity().getText());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			} catch (ResourceException e) {
-				logger.error("post data to solr error ,now store data to mysql ");
+				logger.error("post data to solr error ");
 				logger.error(e.getMessage());
-				twitterDaoImpl.insertStatusInfo(statusInfos);
+				e.printStackTrace();
 			}
 			//同时更新sinceId
-			twitterDaoImpl.updateSinceId(statusInfos.get(0).getStatusId(), i);
+			twitterDaoImpl.updateSinceId(twitterStatuses.get(0).getId(), i);
 		}
-		return statusInfos.size();
+		return twitterStatuses.size();
 	}
 
 	public static Token getTokenAndSinceId() {
