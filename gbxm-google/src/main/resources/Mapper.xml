@@ -3,23 +3,4 @@
 
 <mapper namespace="zx.soft.gbxm.google.dao.GoogleDao">
 
-	<!-- <insert id="insertStatusInfo" parameterType="StatusInfo"> INSERT INTO 
-		googleStatusInfos(statusId,published,url,content,source,last_time) values(#{statusId},#{published},#{url},#{content},#{source},now()); 
-		</insert> -->
-	<insert id="insertStatusInfo" parameterType="StatusInfo">
-		INSERT INTO
-		googleStatusInfo(title,published,updated,id,url,actor_id,actor_displayname,actor_username,actor_url,
-		object_id,object_actor_id,object_actor_displayname,object_actor_url,object_content,object_url,replies_totalitems,
-		resharers_totalitems ,placename,insert_time)
-		values(#{titile},#{published},#{updated},#{id},#{url},#{actorId},#{actorDisplayName},#{actorFamilyNamegivenName},
-		#{actorUrl},#{objectId},#{objectActorId},#{objectActorDisplayName},#{objectActorUrl},
-		#{objectContent},#{objectUrl},#{repliesTotalItems},#{resharersTotalItems},#{placeName},now());
-	</insert>
-
-	<insert id="insertUserInfo" parameterType="UserInfo">
-		INSERT INTO
-		googleUserInfos(userId,userName,lastUpdateTime)
-		values(#{userId},#{userName},#{lastUpdateTime});
-	</insert>
-
 </mapper>

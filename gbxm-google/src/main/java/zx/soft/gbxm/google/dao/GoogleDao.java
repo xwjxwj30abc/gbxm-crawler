@@ -8,8 +8,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import zx.soft.gbxm.google.domain.GoogleToken;
-import zx.soft.gbxm.google.domain.StatusInfo;
-import zx.soft.gbxm.google.domain.UserInfo;
 
 public interface GoogleDao {
 
@@ -30,9 +28,5 @@ public interface GoogleDao {
 
 	@Select("SELECT  `app_name`,`client_id`,`client_secret` FROM ${tableName} WHERE id=#{id}")
 	public GoogleToken getGoogleTokenById(@Param("tableName") String tableName, @Param("id") int id);
-
-	public void insertStatusInfo(StatusInfo statusInfo);
-
-	public void insertUserInfo(UserInfo userInfo);
 
 }

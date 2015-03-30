@@ -16,12 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import zx.soft.gbxm.google.dao.GoogleDaoImpl;
+import zx.soft.gbxm.google.domain.GooglePlusStatus;
 import zx.soft.gbxm.google.domain.GoogleToken;
 import zx.soft.gbxm.google.domain.PostData;
 import zx.soft.gbxm.google.domain.RecordInfo;
-import zx.soft.gbxm.google.domain.StatusInfo;
 import zx.soft.utils.checksum.CheckSumUtils;
 import zx.soft.utils.json.JsonUtils;
+import zx.soft.utils.time.TimeUtils;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.plus.Plus;
@@ -71,32 +72,33 @@ public class GoogleSpider {
 			logger.info("待更新用户数量" + userIdList.size());
 			long currentTime = System.currentTimeMillis();
 			for (String userId : userIdList) {
-				ArrayList<StatusInfo> statusInfos = new ArrayList<>();
+				ArrayList<GooglePlusStatus> googlePlusStatuses = new ArrayList<>();
 				lastUpdateTme = googleDaoImpl.getLastUpdateTimeByUserId(userInfoTableName, userId).getTime();
-				statusInfos = activityList.getActivitiesByUserId(userId, lastUpdateTme);
-				if (statusInfos.size() > 0) {
+				googlePlusStatuses = activityList.getActivitiesByUserId(userId, lastUpdateTme);
+				if (googlePlusStatuses.size() > 0) {
 					List<RecordInfo> records = new ArrayList<>();
-					for (StatusInfo statusInfo : statusInfos) {
+					for (GooglePlusStatus googlePlusStatus : googlePlusStatuses) {
 						RecordInfo record = new RecordInfo();
-						record.setId(CheckSumUtils.getMD5(statusInfo.getUrl()).toUpperCase());
-						record.setMid(statusInfo.getId());
-						record.setUsername(statusInfo.getActorDisplayName());
-						record.setNickname(statusInfo.getActorFamilyNamegivenName());
-						record.setOriginal_id(statusInfo.getObjectId());
-						record.setOriginal_uid(statusInfo.getObjectActorId());
-						record.setOriginal_name(statusInfo.getObjectActorDisplayName());
-						record.setOriginal_url(statusInfo.getObjectUrl());
-						record.setUrl(statusInfo.getUrl());
-						record.setHome_url(statusInfo.getActorUrl());
-						record.setTitle(statusInfo.getTitile());
-						record.setContent(statusInfo.getObjectContent());
-						record.setComment_count(statusInfo.getRepliesTotalItems());
-						record.setRepost_count(statusInfo.getResharersTotalItems());
-						record.setTimestamp(statusInfo.getPublished().getTime());
+						record.setId(CheckSumUtils.getMD5(googlePlusStatus.getUrl()).toUpperCase());
+						record.setMid(googlePlusStatus.getId());
+						record.setUsername(googlePlusStatus.getActor_id());
+						record.setNickname(googlePlusStatus.getActor_display_name());
+						record.setOriginal_id(googlePlusStatus.getObject_id());
+						record.setOriginal_uid(googlePlusStatus.getObject_actor_id());
+						record.setOriginal_name(googlePlusStatus.getObject_actor_display_name());
+						record.setOriginal_url(googlePlusStatus.getObject_url());
+						record.setUrl(googlePlusStatus.getUrl());
+						record.setTitle(googlePlusStatus.getTitle());
+						record.setContent(googlePlusStatus.getObject_original_content());
+						record.setComment_count(googlePlusStatus.getObject_replies_totalitems());
+						record.setRepost_count(googlePlusStatus.getObject_resharers_totalitems());
+						record.setAttitude_count(googlePlusStatus.getObject_plusoners_totalitems());
+						record.setTimestamp(TimeUtils.transTimeLong(googlePlusStatus.getPublished()));
 						record.setLasttime(currentTime);
 						record.setFirst_time(currentTime);
-						record.setUpdate_time(statusInfo.getUpdated().getTime());
-						record.setLocation(statusInfo.getPlaceName());
+						record.setUpdate_time(TimeUtils.transTimeLong(googlePlusStatus.getUpdated()));
+						record.setLocation(googlePlusStatus.getPlace_name());
+						record.setGeo(googlePlusStatus.getLatitude() + " " + googlePlusStatus.getLongitude());
 						records.add(record);
 						logger.info("add one record");
 					}
@@ -114,9 +116,9 @@ public class GoogleSpider {
 							e.printStackTrace();
 						}
 					} catch (ResourceException e) {
-						logger.error("post data to solr error ,now insert into mysql");
+						logger.error("post data to solr error");
 						logger.error(e.getMessage());
-						googleDaoImpl.insertStatusInfo(statusInfos);
+						e.printStackTrace();
 					}
 				}
 				if (googleDaoImpl.isExisted(userInfoTableName, userId)) {
@@ -126,7 +128,7 @@ public class GoogleSpider {
 			}
 
 			long spendTime = System.currentTimeMillis() - currentTime;
-			logger.info("开始睡眠" + (3000_000 - spendTime) + "毫秒");
+			logger.info("开始睡眠" + (3500_000 - spendTime) + "毫秒");
 			Thread.sleep(3000_000 - spendTime);
 			logger.info("睡眠结束");
 		}
@@ -156,7 +158,7 @@ public class GoogleSpider {
 					try {
 						googleSpider.run(credential);
 					} catch (IOException e1) {
-						logger.info("again 500 Internal Server Error.");
+						logger.error("again 500 Internal Server Error.");
 						e1.printStackTrace();
 					}
 				}

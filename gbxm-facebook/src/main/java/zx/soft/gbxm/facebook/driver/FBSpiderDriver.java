@@ -3,8 +3,6 @@ package zx.soft.gbxm.facebook.driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import zx.soft.gbxm.facebook.api.FBSpider;
-
 public class FBSpiderDriver {
 
 	private static Logger logger = LoggerFactory.getLogger(FBSpiderDriver.class);
@@ -20,7 +18,6 @@ public class FBSpiderDriver {
 		switch (args[0]) {
 		case "facebook":
 			logger.info("facebook spider:");
-			FBSpider.main(leftArgs);
 		}
 
 	}

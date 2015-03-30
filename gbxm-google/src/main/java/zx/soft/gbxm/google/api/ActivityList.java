@@ -1,18 +1,17 @@
 package zx.soft.gbxm.google.api;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import zx.soft.gbxm.google.domain.StatusInfo;
-import zx.soft.model.status.GooglePlusStatus;
+import zx.soft.gbxm.google.domain.GooglePlusStatus;
 
 import com.google.api.services.plus.Plus;
 import com.google.api.services.plus.Plus.Activities.List;
 import com.google.api.services.plus.model.Activity;
+import com.google.api.services.plus.model.Activity.PlusObject.Attachments;
 import com.google.api.services.plus.model.ActivityFeed;
 
 public class ActivityList {
@@ -51,69 +50,60 @@ public class ActivityList {
 				logger.info(activity.getId());
 				GooglePlusStatus googlePlusStatus = new GooglePlusStatus();
 				googlePlusStatus.setId(activity.getId());
-				googlePlusStatus.setTitle(activity.getTitle());
+
+				if (activity.getTitle() != null) {
+					googlePlusStatus.setTitle(activity.getTitle());
+				}
 				googlePlusStatus.setPublished(activity.getPublished().toStringRfc3339());
-				googlePlusStatus.setUpdated(activity.getUpdated().toStringRfc3339());
+				if (activity.getUpdated() != null) {
+					googlePlusStatus.setUpdated(activity.getUpdated().toStringRfc3339());
+				}
 				googlePlusStatus.setUrl(activity.getUrl());
 				googlePlusStatus.setActor_id(activity.getActor().getId());
 				googlePlusStatus.setActor_display_name(activity.getActor().getDisplayName());
-				googlePlusStatus.setObject_id(activity.getObject().getId());
-				googlePlusStatus.setObject_actor_id(activity.getObject().getActor().getId());
-				googlePlusStatus.setObject_actor_display_name(activity.getObject().getActor().getDisplayName());
-				googlePlusStatus.setObject_original_content(activity.getObject().getOriginalContent());
-				googlePlusStatus.setObject_url(activity.getObject().getUrl());
-				googlePlusStatus.setObject_replies_totalitems(activity.getObject().getReplies().getTotalItems()
-						.intValue());
-				googlePlusStatus.setObject_plusoners_totalitems(activity.getObject().getPlusoners().getTotalItems()
-						.intValue());
-				googlePlusStatus.setObject_resharers_totalitems(activity.getObject().getResharers().getTotalItems()
-						.intValue());
-				googlePlusStatus.setObject_attachments_content(activity.getObject().getAttachments().get(0)
-						.getContent());
-				StatusInfo statusInfo = new StatusInfo();
-				if (activity.getTitle() != null) {
-					statusInfo.setTitile(activity.getTitle());
-				}
-				statusInfo.setPublished(new Timestamp(activity.getPublished().getValue()));
-				if (activity.getUpdated() != null) {
-					statusInfo.setUpdated(new Timestamp(activity.getUpdated().getValue()));
-				}
-				statusInfo.setId(activity.getId());
-				statusInfo.setUrl(activity.getUrl());
-				if (activity.getActor() != null) {
-					statusInfo.setActorId(activity.getActor().getId());
-					statusInfo.setActorDisplayName(activity.getActor().getDisplayName());
-					statusInfo.setActorUrl(activity.getActor().getUrl());
-				}
-				if (activity.getActor().getName() != null) {
-					statusInfo.setActorFamilyNamegivenName(activity.getActor().getName().getFamilyName()
-							+ activity.getActor().getName().getGivenName());
-				}
-				if (activity.getObject().getId() != null) {
-					statusInfo.setObjectId(activity.getObject().getId());
-				}
-				if (activity.getObject().getContent() != null) {
-					statusInfo.setObjectContent(activity.getObject().getContent());
-
-				}
-				if (activity.getObject().getUrl() != null) {
-					statusInfo.setObjectUrl(activity.getObject().getUrl());
+				if (activity.getObject() != null) {
+					googlePlusStatus.setObject_id(activity.getObject().getId());
+					googlePlusStatus.setObject_url(activity.getObject().getUrl());
 				}
 				if (activity.getObject().getActor() != null) {
-					statusInfo.setObjectActorId(activity.getObject().getActor().getId());
-					statusInfo.setObjectActorDisplayName(activity.getObject().getActor().getDisplayName());
-					statusInfo.setObjectActorUrl(activity.getObject().getActor().getUrl());
+					googlePlusStatus.setObject_actor_id(activity.getObject().getActor().getId());
+					googlePlusStatus.setObject_actor_display_name(activity.getObject().getActor().getDisplayName());
 				}
-				if (activity.getObject().getReplies().getTotalItems() != null) {
-					statusInfo.setRepliesTotalItems(activity.getObject().getReplies().getTotalItems().intValue());
+				if (activity.getObject().getOriginalContent() != null) {
+					googlePlusStatus.setObject_original_content(activity.getObject().getOriginalContent());
 				}
-				if (activity.getObject().getResharers().getTotalItems() != null) {
-					statusInfo.setResharersTotalItems(activity.getObject().getResharers().getTotalItems().intValue());
+				if (activity.getObject().getReplies() != null) {
+					googlePlusStatus.setObject_replies_totalitems(activity.getObject().getReplies().getTotalItems()
+							.intValue());
+				}
+				if (activity.getObject().getPlusoners() != null) {
+					googlePlusStatus.setObject_plusoners_totalitems(activity.getObject().getPlusoners().getTotalItems()
+							.intValue());
+				}
+				if (activity.getObject().getResharers() != null) {
+					googlePlusStatus.setObject_resharers_totalitems(activity.getObject().getResharers().getTotalItems()
+							.intValue());
+				}
+
+				if (activity.getObject().getAttachments() != null) {
+					String content = "";
+					java.util.List<Attachments> attachments = activity.getObject().getAttachments();
+					for (Attachments attachment : attachments) {
+						content = content + "  " + attachment.getContent();
+					}
+					googlePlusStatus.setObject_attachments_content(content);
+				}
+				if (activity.getAnnotation() != null) {
+					googlePlusStatus.setAnnotation(activity.getAnnotation());
+				}
+				if (activity.getGeocode() != null) {
+					googlePlusStatus.setLatitude(Double.parseDouble(activity.getGeocode().split(" ")[0]));
+					googlePlusStatus.setLongitude(Double.parseDouble(activity.getGeocode().split(" ")[1]));
 				}
 				if (activity.getPlaceName() != null) {
-					statusInfo.setPlaceName(activity.getPlaceName());
+					googlePlusStatus.setPlace_name(activity.getPlaceName());
 				}
-				googlePlusStatuses.add(statusInfo);
+				googlePlusStatuses.add(googlePlusStatus);
 			}
 
 			String nextPageToken = feed.getNextPageToken();
