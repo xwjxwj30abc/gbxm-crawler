@@ -14,8 +14,6 @@
 	<description>socila network service crawler</description>
 
 	<modules>
-		<module>gbxm-core</module>
-		<module>gbxm-dao</module>
 		<module>gbxm-web</module>
 		<module>gbxm-twitter</module>
 		<module>gbxm-facebook</module>
@@ -27,6 +25,11 @@
 			<groupId>zx.soft</groupId>
 			<artifactId>common-utils</artifactId>
 			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>zx.soft</groupId>
+			<artifactId>guobao-model</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 	</dependencies>
 

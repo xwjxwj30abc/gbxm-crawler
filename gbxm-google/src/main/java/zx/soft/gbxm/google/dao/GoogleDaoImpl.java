@@ -10,9 +10,11 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import zx.soft.gbxm.google.domain.GoogleToken;
 import zx.soft.gbxm.google.domain.StatusInfo;
 import zx.soft.gbxm.google.domain.UserInfo;
 import zx.soft.gbxm.google.utils.MybatisConfig;
+import zx.soft.utils.json.JsonUtils;
 
 public class GoogleDaoImpl {
 
@@ -43,6 +45,7 @@ public class GoogleDaoImpl {
 					logger.info("insert  " + statusInfo.toString() + " succeed.");
 				} catch (Exception e) {
 					try {
+						statusInfo.setTitile(new String(statusInfo.getTitile().getBytes(), "GBK"));
 						statusInfo.setObjectContent(new String(statusInfo.getObjectContent().getBytes(), "GBK"));
 						googleDao.insertStatusInfo(statusInfo);
 					} catch (UnsupportedEncodingException e1) {
@@ -76,20 +79,20 @@ public class GoogleDaoImpl {
 	public boolean isExisted(String tableName, String userId) {
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
-			if (googleDao.getNameByUserId(tableName, userId) == null) {
+			if (googleDao.getNameByUserId(tableName, userId) == 0) {
 				return Boolean.FALSE;
 			}
 			return Boolean.TRUE;
 		}
 	}
 
-	//根据用户Id获取用户名
-	public String getNameByUserId(String tableName, String userId) {
-		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
-			return googleDao.getNameByUserId(tableName, userId);
-		}
-	}
+	/*	//根据用户Id获取用户名
+		public String getNameByUserId(String tableName, String userId) {
+			try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+				GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
+				return googleDao.getNameByUserId(tableName, userId);
+			}
+		}*/
 
 	//根据用户Id获取上次更新时间
 	public Timestamp getLastUpdateTimeByUserId(String tableName, String userId) {
@@ -104,16 +107,40 @@ public class GoogleDaoImpl {
 		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
 			googleDao.updateUserInfo(userId, lastUpdateTime);
-			logger.info("update userInfo");
+			//	logger.info("update userInfo");
 		}
+	}
+
+	//获取google应用信息
+	public List<GoogleToken> getAllGoogleToken(String tableName) {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
+			int count;
+			count = googleDao.getTableCount(tableName);
+			List<GoogleToken> googleTokens = new ArrayList<>();
+			for (int i = 1; i < count + 1; i++) {
+				GoogleToken token = googleDao.getGoogleTokenById(tableName, i);
+				if (token != null) {
+					googleTokens.add(token);
+				}
+			}
+			logger.info("token sixe=" + googleTokens.size());
+			return googleTokens;
+		}
+	}
+
+	public GoogleToken getGoogleTokenById(String tableName, int id) {
+		GoogleToken token = null;
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
+			token = googleDao.getGoogleTokenById(tableName, id);
+		}
+		return token;
 	}
 
 	public static void main(String[] args) {
 		GoogleDaoImpl googleDaoImpl = new GoogleDaoImpl();
-		StatusInfo statusInfo = new StatusInfo();
-		List<StatusInfo> statusInfoes = new ArrayList<>();
-		statusInfo.setPublished(new Timestamp(System.currentTimeMillis()));
-		statusInfoes.add(statusInfo);
-		googleDaoImpl.insertStatusInfo(statusInfoes);
+		List<GoogleToken> tokens = googleDaoImpl.getAllGoogleToken("gplusApps");
+		System.out.println(JsonUtils.toJson(tokens));
 	}
 }

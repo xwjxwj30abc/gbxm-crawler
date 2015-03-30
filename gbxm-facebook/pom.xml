@@ -14,7 +14,7 @@
 	<description>social network data-facebook</description>
 
 	<dependencies>
-	<!-- spring social  facebook包，注意版本号 -->
+		<!-- spring social facebook包，注意版本号 -->
 		<dependency>
 			<groupId>org.springframework.social</groupId>
 			<artifactId>spring-social-facebook</artifactId>
@@ -45,6 +45,18 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 		</dependency>
+		<!-- restFB包 -->
+		<dependency>
+			<groupId>com.restfb</groupId>
+			<artifactId>restfb</artifactId>
+			<version>1.9.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.restfb</groupId>
+			<artifactId>restfb-examples</artifactId>
+			<version>1.6.7</version>
+		</dependency>
+
 		<!-- 日志包 -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

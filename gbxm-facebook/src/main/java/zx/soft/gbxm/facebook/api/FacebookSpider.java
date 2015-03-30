@@ -11,7 +11,7 @@ public class FacebookSpider {
 		int i = 1;
 		try {
 			FacebookTemplate facebook = new FacebookTemplate(
-					"CAAEyboPYV4UBAIQy4MwMiWmHTM0NWYTEGoTZAavB1hxoxIJoBkLlPK6ZCZCTlC6Bq8gibj5Atf0pAcoW9GnPbHhxZCmpxhhS1llTht5kPUZCqnDqVpdcbX0T7J4jigNs8bn2oJpuwV3J4qZBjNQHNVqtdBTqZAIEUoOLgYliJ8cVfWiYaTXSPwsf4JdZArsj9TRqA7mlNRZCdFcGHjoQZCX89X",
+					"CAATviZCAcXPoBALjAYeoZAKC8rwkpxHNZCk8uRu5uzPuNBzvZAs1rEWWnFRN2pb7W1FVb4rg67SVx9gcOIEYqa2hp1rW73rxxAQi5OXzxOZBnOuvI3fZCnTrk2rP7edBkaBxYPOXZAwinDQOjMLLrw9YVlZCS4q1OIKzQ6CDRtIZBobvKsmbP7CQY",
 					"xwj_zxsoft");
 			Integer limit = 200;
 			Integer offset = 0;
@@ -20,13 +20,14 @@ public class FacebookSpider {
 			boolean flag = true;
 			while (flag) {
 				PagedList<Post> tests = facebook.feedOperations().getHomeFeed(
-						new PagingParameters(limit, offset * limit, since, until));
+						new PagingParameters(limit, limit * offset, since, until));
 				System.out.println(tests.size());
 				for (Post test : tests) {
-					System.out.println(test.getFrom().getId() + test.getMessage());
-				}
-				if (tests.size() == 0) {
-					flag = false;
+					System.out.println("************下个状态*******************");
+					System.out.println("状态Id ：" + test.getFrom().getId());
+					System.out.println("状态信息 ：" + test.getMessage());
+					System.out.println("创建时间 ：" + test.getCreatedTime());
+					System.out.println("***************************************");
 				}
 				offset++;
 			}

@@ -130,7 +130,6 @@ public class TwitterSpider {
 			postData.setNum(records.size());
 			logger.info("post data number=" + records.size());
 			postData.setRecords(records);
-			System.out.println(JsonUtils.toJsonWithoutPretty(postData));
 			Representation entity = new StringRepresentation(JsonUtils.toJsonWithoutPretty(postData));
 			entity.setMediaType(MediaType.APPLICATION_JSON);
 			try {

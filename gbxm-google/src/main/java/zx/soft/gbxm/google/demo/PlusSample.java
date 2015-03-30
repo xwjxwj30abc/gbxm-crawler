@@ -1,7 +1,6 @@
 package zx.soft.gbxm.google.demo;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 
@@ -13,7 +12,6 @@ import com.google.api.client.auth.oauth2.DataStoreCredentialRefreshListener;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver.Builder;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -46,11 +44,12 @@ public class PlusSample {
 	private static DateTime lastUpdateTime = new DateTime(0);
 
 	private static Credential authorize(String userId) throws IOException {
-		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(
-				PlusSample.class.getResourceAsStream("/client_secrets.json")));
-
+		/*	GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(
+					PlusSample.class.getResourceAsStream("/client_secrets.json")));
+		*/
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
-				clientSecrets, Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory)
+				"804751998958-r10ohle1oem23jlgtff9npk68fh7v53i.apps.googleusercontent.com", "xSgLqQWNjNtj_RmsHfCdmYyG",
+				Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory)
 				.addRefreshListener(new DataStoreCredentialRefreshListener(userId, dataStoreFactory))
 				.setApprovalPrompt("force").setAccessType("offline").build();
 		Builder builder = new Builder().setHost("localhost").setPort(8080);
@@ -61,7 +60,7 @@ public class PlusSample {
 
 		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
-		Credential credential = authorize("test");
+		Credential credential = authorize("user");
 		plus = new Plus.Builder(httpTransport, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
 		listActivities("110924633889503463658");
 		while (true) {

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import zx.soft.gbxm.google.domain.StatusInfo;
+import zx.soft.model.status.GooglePlusStatus;
 
 import com.google.api.services.plus.Plus;
 import com.google.api.services.plus.Plus.Activities.List;
@@ -31,14 +32,14 @@ public class ActivityList {
 	 * @return
 	 * @throws IOException
 	 */
-	public ArrayList<StatusInfo> getActivitiesByUserId(String userId, long lastUpdatedTime) throws IOException {
-		ArrayList<StatusInfo> statusInfos = new ArrayList<>();
+	public ArrayList<GooglePlusStatus> getActivitiesByUserId(String userId, long lastUpdatedTime) throws IOException {
+		ArrayList<GooglePlusStatus> googlePlusStatuses = new ArrayList<>();
 		List listActivities = plus.activities().list(userId, "public");
 		listActivities.setMaxResults(100L);//最大可设置为100
-		listActivities
-		.setFields("nextPageToken,items(title,published,updated,id,url,actor/id,actor/displayName,actor/name/familyName"
-				+ ",actor/name/givenName,actor/url,object/actor/id,object/actor/id,object/actor/displayName,object/actor/url,"
-				+ "object/content,object/url,object/replies/totalItems,object/resharers/totalItems,placeName)");
+		listActivities.setFields("nextPageToken,items(id,title,published,updated,url,actor/id,actor/displayName,"
+				+ "object/id,object/actor/id,object/actor/displayName,object/originalContent,object/url,"
+				+ "object/replies/totalItems,object/plusoners/totalItems,object/resharers/totalItems,"
+				+ "object/attachments,annotation,geocode,placeName)");
 		ActivityFeed feed = listActivities.execute();
 		int currentPageNumber = 0;
 		while (feed.getItems() != null && !feed.getItems().isEmpty() && ++currentPageNumber < PAGE_COUNT) {
@@ -48,6 +49,27 @@ public class ActivityList {
 			}
 			for (Activity activity : feed.getItems()) {
 				logger.info(activity.getId());
+				GooglePlusStatus googlePlusStatus = new GooglePlusStatus();
+				googlePlusStatus.setId(activity.getId());
+				googlePlusStatus.setTitle(activity.getTitle());
+				googlePlusStatus.setPublished(activity.getPublished().toStringRfc3339());
+				googlePlusStatus.setUpdated(activity.getUpdated().toStringRfc3339());
+				googlePlusStatus.setUrl(activity.getUrl());
+				googlePlusStatus.setActor_id(activity.getActor().getId());
+				googlePlusStatus.setActor_display_name(activity.getActor().getDisplayName());
+				googlePlusStatus.setObject_id(activity.getObject().getId());
+				googlePlusStatus.setObject_actor_id(activity.getObject().getActor().getId());
+				googlePlusStatus.setObject_actor_display_name(activity.getObject().getActor().getDisplayName());
+				googlePlusStatus.setObject_original_content(activity.getObject().getOriginalContent());
+				googlePlusStatus.setObject_url(activity.getObject().getUrl());
+				googlePlusStatus.setObject_replies_totalitems(activity.getObject().getReplies().getTotalItems()
+						.intValue());
+				googlePlusStatus.setObject_plusoners_totalitems(activity.getObject().getPlusoners().getTotalItems()
+						.intValue());
+				googlePlusStatus.setObject_resharers_totalitems(activity.getObject().getResharers().getTotalItems()
+						.intValue());
+				googlePlusStatus.setObject_attachments_content(activity.getObject().getAttachments().get(0)
+						.getContent());
 				StatusInfo statusInfo = new StatusInfo();
 				if (activity.getTitle() != null) {
 					statusInfo.setTitile(activity.getTitle());
@@ -91,7 +113,7 @@ public class ActivityList {
 				if (activity.getPlaceName() != null) {
 					statusInfo.setPlaceName(activity.getPlaceName());
 				}
-				statusInfos.add(statusInfo);
+				googlePlusStatuses.add(statusInfo);
 			}
 
 			String nextPageToken = feed.getNextPageToken();
@@ -101,7 +123,7 @@ public class ActivityList {
 			listActivities.setPageToken(nextPageToken);
 			feed = listActivities.execute();
 		}
-		return statusInfos;
+		return googlePlusStatuses;
 	}
 
 	public Plus getPlus() {

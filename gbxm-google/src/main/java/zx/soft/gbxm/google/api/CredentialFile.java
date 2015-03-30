@@ -3,7 +3,6 @@ package zx.soft.gbxm.google.api;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -38,16 +37,16 @@ public class CredentialFile {
 	 * @throws IOException
 	 * @throws GeneralSecurityException
 	 */
-	public Credential loadCredential(String credentialFilename, String userId) throws IOException,
-			GeneralSecurityException {
+	public Credential loadCredential(String clientID, String clientSecret, String credentialFilename, String userId)
+			throws IOException, GeneralSecurityException {
 		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		credentialFile = new File(props.getProperty("credential_path") + credentialFilename);
+		logger.info("credentialFile path=" + props.getProperty("credential_path") + credentialFilename);
 		dataStoreFactory = new FileDataStoreFactory(credentialFile);
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
-				props.getProperty("client_id"), props.getProperty("client_secret"),
-				Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory).build();
+				clientID, clientSecret, Collections.singleton(PlusScopes.PLUS_ME))
+				.setDataStoreFactory(dataStoreFactory).build();
 		Credential credential = flow.loadCredential(userId);
-		logger.info("token 在" + new Timestamp(credential.getExpirationTimeMilliseconds()).toString() + "时候过期");
 		if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
 			return credential;
 		}
