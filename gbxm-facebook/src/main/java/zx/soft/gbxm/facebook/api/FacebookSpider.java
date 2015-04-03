@@ -17,6 +17,7 @@ import zx.soft.gbxm.facebook.common.Refresh;
 import zx.soft.gbxm.facebook.common.RestletPost;
 import zx.soft.gbxm.facebook.dao.FBDaoImpl;
 import zx.soft.gbxm.facebook.domain.FacebookStatus;
+import zx.soft.gbxm.facebook.domain.FacebookUser;
 import zx.soft.gbxm.facebook.domain.PostData;
 import zx.soft.gbxm.facebook.domain.RecordInfo;
 import zx.soft.utils.json.JsonUtils;
@@ -43,6 +44,16 @@ public class FacebookSpider {
 			if (posts.size() > 0) {
 				for (Post post : posts) {
 					FacebookStatus facebookStatus = Convert.convertPost2FacebookStatus(post);
+					String userId = post.getFrom().getId();
+					FacebookUser facebookUser = Convert.convertFacebookProfile2FacebookUser(facebook.userOperations()
+							.getUserProfile(userId));
+					if (fbDaoImpl.isExisted(userId)) {
+						//更新用户信息
+						fbDaoImpl.updateFacebookUser(facebookUser);
+					} else {
+						//插入用户信息
+						fbDaoImpl.insertFacebookUser(facebookUser);
+					}
 					facebookStatuses.add(facebookStatus);
 					System.out.println(JsonUtils.toJsonWithoutPretty(facebookStatus));
 					RecordInfo record = Convert.convertFacebookStatus2RecordInfo(facebookStatus, until * 1000);
@@ -66,6 +77,7 @@ public class FacebookSpider {
 
 	public static void main(String[] args) throws InterruptedException {
 
+		//7619396355
 		FBDaoImpl fbDaoImpl = new FBDaoImpl();
 		FacebookSpider spider = new FacebookSpider();
 		int i = 1;

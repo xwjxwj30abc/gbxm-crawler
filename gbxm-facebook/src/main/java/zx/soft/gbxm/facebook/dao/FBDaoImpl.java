@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import zx.soft.gbxm.facebook.domain.FacebookStatus;
+import zx.soft.gbxm.facebook.domain.FacebookUser;
 import zx.soft.gbxm.facebook.utils.MybatisConfig;
 
 public class FBDaoImpl {
@@ -101,6 +102,33 @@ public class FBDaoImpl {
 					}
 				}
 			}
+		}
+	}
+
+	//插入用户信息
+	public void insertFacebookUser(FacebookUser facebookUser) {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
+			FBDao fbDao = sqlSession.getMapper(FBDao.class);
+			fbDao.insertFacebookUser(facebookUser);
+		}
+	}
+
+	//判断指定id的用户是否存在
+	public boolean isExisted(String id) {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
+			FBDao fbDao = sqlSession.getMapper(FBDao.class);
+			if (fbDao.getNameById(id) != null) {
+				return true;
+			}
+			return false;
+		}
+	}
+
+	//更新用户信息
+	public void updateFacebookUser(FacebookUser facebookUser) {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
+			FBDao fbDao = sqlSession.getMapper(FBDao.class);
+			fbDao.updateFacebookUser(facebookUser);
 		}
 	}
 }
