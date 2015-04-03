@@ -1,12 +1,14 @@
 package zx.soft.gbxm.facebook.dao;
 
-import java.sql.Timestamp;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import zx.soft.gbxm.facebook.domain.FacebookStatus;
 import zx.soft.gbxm.facebook.utils.MybatisConfig;
 
 public class FBDaoImpl {
@@ -25,30 +27,47 @@ public class FBDaoImpl {
 	 * @param id
 	 * @return
 	 */
-	public String getFBToken(String tablename, int id) {
+	public String getToken(int id) {
 		String token = null;
 		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
 			FBDao fbDao = sqlSession.getMapper(FBDao.class);
-			token = fbDao.getToken(tablename, id);
+			token = fbDao.getToken(id);
 		}
 		return token;
 	}
 
 	/**
-	 * 获得指定id的token 过期时间
+	 * 获得指定id token的since
 	 * @param tablename
 	 * @param id
 	 * @return
 	 */
-	public Timestamp getExpireTime(String tablename, int id) {
-		Timestamp expireTime = null;
+	public long getSince(int id) {
+		long since;
 		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
 			FBDao fbDao = sqlSession.getMapper(FBDao.class);
-			expireTime = fbDao.getExpireTime(tablename, id);
+			since = fbDao.getSince(id);
 		}
-		return expireTime;
+		return since;
 	}
 
+	/**
+	 * 更新sinceId
+	 * @param since
+	 * @param token
+	 */
+	public void updateSince(long since, String token) {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
+			FBDao fbDao = sqlSession.getMapper(FBDao.class);
+			fbDao.updateSince(since, token);
+		}
+	}
+
+	/**
+	 * 获取表长度
+	 * @param tablename
+	 * @return
+	 */
 	public int getTableLength(String tablename) {
 		int length = 0;
 		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
@@ -58,13 +77,30 @@ public class FBDaoImpl {
 		return length;
 	}
 
-	public static void main(String[] args) {
-		FBDaoImpl fbDaoImpl = new FBDaoImpl();
-		String token = fbDaoImpl.getFBToken("fb_token", 2);
-		Timestamp expireTime = fbDaoImpl.getExpireTime("fb_token", 2);
-		int length = fbDaoImpl.getTableLength("fb_token");
-		logger.info(token);
-		logger.info("time=" + expireTime.getTime());
-		logger.info(String.valueOf(length));
+	/**
+	 * 插入facebook状态信息到数据库
+	 * @param facebookStatuses
+	 * @throws UnsupportedEncodingException
+	 */
+	public void insertFacebookStatus(List<FacebookStatus> facebookStatuses) throws UnsupportedEncodingException {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
+			FBDao fbDao = sqlSession.getMapper(FBDao.class);
+			for (FacebookStatus facebookStatus : facebookStatuses) {
+				try {
+					fbDao.insertFacebookStatus(facebookStatus);
+					logger.info("insert " + facebookStatus.getId() + " to db succeed.");
+				} catch (Exception e) {
+					logger.info(e.getMessage());
+					if (e.getMessage().contains("incorrect string value")) {
+						facebookStatus.setMessage("此信息不能正常显示");
+						fbDao.insertFacebookStatus(facebookStatus);
+						logger.info("insert " + facebookStatus.getId() + " to db succeed.");
+					}
+					if (e.getMessage().contains("Dup")) {
+						//
+					}
+				}
+			}
+		}
 	}
 }

@@ -1,0 +1,60 @@
+{
+    "parking": {
+        "lot": 0,
+        "street": 0,
+        "valet": 0
+    },
+    "hours": {
+        "fri_1_close": "01:00",
+        "sun_1_close": "01:00",
+        "sat_1_open": "19:00",
+        "sat_1_close": "01:00",
+        "mon_1_open": "19:00",
+        "wed_1_close": "01:00",
+        "sun_1_open": "19:00",
+        "thu_1_open": "19:00",
+        "thu_1_close": "01:00",
+        "fri_1_open": "19:00",
+        "tue_1_open": "19:00",
+        "mon_1_close": "01:00",
+        "wed_1_open": "19:00",
+        "tue_1_close": "01:00"
+    },
+    "website": "http://chloewinebar.com/",
+    "is_published": true,
+    "about": "Chloé is a newly opened French wine bar and lounge.",
+    "link": "https://www.facebook.com/chloewinebar",
+    "talking_about_count": 281,
+    "description": "Located in Wuhan's historic Hankou District, Chloé is the eponymous creation of Francophile wine distributor Chloe Wu, a Wuhan native, and is set in a Russian heritage building with a stylish interior that merges East with West. The core of the drinks list is wine from Bordeaux, but the bar also offers other reasonably priced wines, classic cocktails and a small French and Spanish snack menu. The upbeat but unobtrusive lounge music, eclectic designer furniture and French nationals behind the wine list (and sometimes the bar) make for a truly unique place to enjoy a few drinks in old Hankou.",
+    "category_list": [
+        {
+            "name": "Wine Bar",
+            "id": "192661127431931"
+        }
+    ],
+    "cover": {
+        "cover_id": "536167579775050",
+        "source": "https://fbcdn-sphotos-a-a.akamaihd.net/hphotos-ak-xap1/t31.0-8/s720x720/977770_536167579775050_774846158_o.jpg",
+        "id": "536167579775050",
+        "offset_x": 0,
+        "offset_y": 50
+    },
+    "phone": "(027) 8288 6366",
+    "name": "Chloé Bar À Vins",
+    "can_post": true,
+    "location": {
+        "country": "China",
+        "city": "Wuhan",
+        "street": "145 Poyang Street",
+        "latitude": 30.5833,
+        "longitude": 114.2833
+    },
+    "id": "517825994942542",
+    "category": "Bar",
+    "has_added_app": false,
+    "checkins": 51,
+    "is_community_page": false,
+    "likes": 4549,
+    "username": "chloewinebar",
+    "were_here_count": 0
+}
