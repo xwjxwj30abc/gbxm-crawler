@@ -1,4 +1,5 @@
-sns-crawler
+gbxm-crawler
 ===========
 
-social network service crawler
+分三个模块：facebook,google,twitter
+
