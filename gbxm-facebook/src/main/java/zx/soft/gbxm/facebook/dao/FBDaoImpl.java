@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import zx.soft.gbxm.facebook.domain.FacebookStatus;
 import zx.soft.gbxm.facebook.domain.FacebookUser;
 import zx.soft.gbxm.facebook.utils.MybatisConfig;
+import zx.soft.utils.log.LogbackUtil;
 
 public class FBDaoImpl {
 
@@ -110,6 +111,8 @@ public class FBDaoImpl {
 		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
 			FBDao fbDao = sqlSession.getMapper(FBDao.class);
 			fbDao.insertFacebookUser(facebookUser);
+		} catch (Exception e) {
+			logger.error("Exception:{}", LogbackUtil.expection2Str(e));
 		}
 	}
 
@@ -129,6 +132,8 @@ public class FBDaoImpl {
 		try (SqlSession sqlSession = sqlSessionFactory.openSession();) {
 			FBDao fbDao = sqlSession.getMapper(FBDao.class);
 			fbDao.updateFacebookUser(facebookUser);
+		} catch (Exception e) {
+			logger.error("Exception:{}", LogbackUtil.expection2Str(e));
 		}
 	}
 }

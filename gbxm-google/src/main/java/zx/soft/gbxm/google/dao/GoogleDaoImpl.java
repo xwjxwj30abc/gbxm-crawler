@@ -9,9 +9,10 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import zx.soft.gbxm.google.domain.GooglePlusStatus;
 import zx.soft.gbxm.google.domain.GoogleToken;
 import zx.soft.gbxm.google.utils.MybatisConfig;
-import zx.soft.utils.json.JsonUtils;
+import zx.soft.utils.log.LogbackUtil;
 
 public class GoogleDaoImpl {
 
@@ -82,7 +83,7 @@ public class GoogleDaoImpl {
 					googleTokens.add(token);
 				}
 			}
-			logger.info("token sixe=" + googleTokens.size());
+			logger.info("token size=" + googleTokens.size());
 			return googleTokens;
 		}
 	}
@@ -96,9 +97,35 @@ public class GoogleDaoImpl {
 		return token;
 	}
 
-	public static void main(String[] args) {
-		GoogleDaoImpl googleDaoImpl = new GoogleDaoImpl();
-		List<GoogleToken> tokens = googleDaoImpl.getAllGoogleToken("gplusApps");
-		System.out.println(JsonUtils.toJson(tokens));
+	//插入获取的google+状态信息
+	public void insertGooglePlusStatus(GooglePlusStatus googlePlusStatus) {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
+			googleDao.insertGooglePlusStatus(googlePlusStatus);
+		}
+	}
+
+	//插入list<GooglePlusStatus>信息
+	public void insertGooglePlusListStatus(List<GooglePlusStatus> googlePlusStatuses) {
+		try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+			GoogleDao googleDao = sqlSession.getMapper(GoogleDao.class);
+			for (GooglePlusStatus googlePlusStatus : googlePlusStatuses) {
+				try {
+					logger.info("insert google plus status to DB", googlePlusStatus.getId());
+					googleDao.insertGooglePlusStatus(googlePlusStatus);
+				} catch (Exception e) {
+					if (LogbackUtil.expection2Str(e).contains("MysqlDataTruncation")) {
+						try {
+							googlePlusStatus.setTitle(new String(googlePlusStatus.getTitle().getBytes(), "GBK"));
+							googleDao.insertGooglePlusStatus(googlePlusStatus);
+						} catch (Exception e1) {
+							logger.error("Exception:{}", LogbackUtil.expection2Str(e1));
+						}
+					} else {
+						logger.error("Exception:{}", LogbackUtil.expection2Str(e));
+					}
+				}
+			}
+		}
 	}
 }

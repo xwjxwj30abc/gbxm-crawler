@@ -20,7 +20,6 @@ import zx.soft.gbxm.facebook.domain.FacebookStatus;
 import zx.soft.gbxm.facebook.domain.FacebookUser;
 import zx.soft.gbxm.facebook.domain.PostData;
 import zx.soft.gbxm.facebook.domain.RecordInfo;
-import zx.soft.utils.json.JsonUtils;
 import zx.soft.utils.log.LogbackUtil;
 
 public class FacebookSpider {
@@ -55,7 +54,6 @@ public class FacebookSpider {
 						fbDaoImpl.insertFacebookUser(facebookUser);
 					}
 					facebookStatuses.add(facebookStatus);
-					System.out.println(JsonUtils.toJsonWithoutPretty(facebookStatus));
 					RecordInfo record = Convert.convertFacebookStatus2RecordInfo(facebookStatus, until * 1000);
 					records.add(record);
 				}
@@ -69,7 +67,6 @@ public class FacebookSpider {
 			}
 		} catch (Exception e) {
 			logger.error("Exception:{}", LogbackUtil.expection2Str(e));
-			e.printStackTrace();
 			logger.info("token 过期，请重新授权该用户，并更新数据库中token");
 		}
 		return length;
@@ -77,7 +74,6 @@ public class FacebookSpider {
 
 	public static void main(String[] args) throws InterruptedException {
 
-		//7619396355
 		FBDaoImpl fbDaoImpl = new FBDaoImpl();
 		FacebookSpider spider = new FacebookSpider();
 		int i = 1;
@@ -87,14 +83,14 @@ public class FacebookSpider {
 		while (true) {
 			nextToken = Refresh.getNextToken(i);
 			since = Refresh.getNextSince(i);
-			logger.info("now token id =" + i);
+			logger.info("token id=" + i + ";next token=" + nextToken + ";since=" + since);
 			try {
 				length = spider.run(nextToken, since);
-				System.out.println("length=" + length);
+				logger.info("length=" + length);
 				i++;
 				if (i > fbDaoImpl.getTableLength("fb_token")) {
 					i = 1;
-					System.out.println("sleep 15 min");
+					logger.info("sleep 15 min");
 					Thread.sleep(15 * 60 * 1000);
 				}
 			} catch (ApiException e) {
@@ -108,7 +104,7 @@ public class FacebookSpider {
 						ConstUtils.setLimit(20);
 					}
 					length = spider.run(nextToken, since);
-					System.out.println("length=" + length);
+					logger.info("length=" + length);
 					i++;
 					if (i > fbDaoImpl.getTableLength("fb_token")) {
 						i = 1;

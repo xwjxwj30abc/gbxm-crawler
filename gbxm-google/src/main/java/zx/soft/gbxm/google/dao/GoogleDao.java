@@ -3,10 +3,12 @@ package zx.soft.gbxm.google.dao;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import zx.soft.gbxm.google.domain.GooglePlusStatus;
 import zx.soft.gbxm.google.domain.GoogleToken;
 
 public interface GoogleDao {
@@ -29,4 +31,14 @@ public interface GoogleDao {
 	@Select("SELECT  `app_name`,`client_id`,`client_secret` FROM ${tableName} WHERE id=#{id}")
 	public GoogleToken getGoogleTokenById(@Param("tableName") String tableName, @Param("id") int id);
 
+	//插入google+状态信息到数据库
+	@Insert("INSERT `status_info_googleplus`(`id`,`title`,`published`,`updated`,`url`,"
+			+ "`actor_id`,`actor_display_name`,`object_id`,`object_actor_id`,`object_actor_display_name`,"
+			+ "`object_original_content`,`object_url`,`object_replies_totalitems`,`object_plusoners_totalitems`,"
+			+ "`object_resharers_totalitems`,`object_attachments_content`,`annotation`,`latitude`,`longitude`,`place_name`,`lasttime`) "
+			+ "VALUES (#{id},#{title},#{published},#{updated},#{url},#{actor_id},#{actor_display_name},"
+			+ "#{object_id},#{object_actor_id},#{object_actor_display_name},#{object_original_content},"
+			+ "#{object_url},#{object_replies_totalitems},#{object_plusoners_totalitems},#{object_resharers_totalitems},"
+			+ "#{object_attachments_content},#{annotation},#{latitude},#{longitude},#{place_name},now())")
+	public void insertGooglePlusStatus(GooglePlusStatus googlePlusStatus);
 }

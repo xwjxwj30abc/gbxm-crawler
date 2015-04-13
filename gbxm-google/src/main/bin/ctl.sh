@@ -13,7 +13,7 @@ while [ -h "$PRG" ]; do
   else
     PRG=`dirname "$PRG"`/"$link"
   fi
- done
+done
 
 # Get standard environment variables
 PRGDIR=`dirname "$PRG"`
@@ -28,7 +28,7 @@ for jar in "$PROJECT_DIR/lib"/*.jar; do
 done
 echo CLASSPATH=$CLASSPATH
 
-JVMARGS="${JVMARGS} -Dproject_dir=${PROJECT_DIR}"
+JVMARGS="${JVMARGS} -Dproject_dir=${PROJECT_DIR} -Djava.net.preferIPv4Stack=true"
 echo JVMARGS=$JVMARGS
 
 usage() {
@@ -40,6 +40,11 @@ usage() {
 start() {
   JAVA=${JAVA-'java'}
   exec $JAVA $JVMARGS -classpath "$CLASSPATH" $mainClass "$@" &
+  echo $! > main.pid
+}
+
+stop() {
+  kill `cat main.pid` > /dev/null
 }
 
 case $1 in
@@ -48,10 +53,12 @@ case $1 in
     start $@
     ;;
   (stop)
-    echo "stop"
+    stop
     ;;
   (restart)
-    echo "restart"
+    stop
+    shift
+    start $@
     ;;
   (*)
     echo >&2 "$PRG: error: unknown command '$1'"

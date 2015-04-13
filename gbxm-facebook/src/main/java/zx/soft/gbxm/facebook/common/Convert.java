@@ -20,6 +20,7 @@ public class Convert {
 		facebookStatus.setFrom_id(post.getFrom().getId());
 		facebookStatus.setFrom_name(post.getFrom().getName());
 		facebookStatus.setMessage(post.getMessage());
+		facebookStatus.setLink(post.getLink());
 		facebookStatus.setCreatedTime(post.getUpdatedTime());
 		facebookStatus.setUpdatedTime(post.getUpdatedTime());
 		facebookStatus.setSharesCount(post.getSharesCount());

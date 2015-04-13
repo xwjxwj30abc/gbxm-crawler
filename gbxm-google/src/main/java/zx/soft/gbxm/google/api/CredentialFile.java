@@ -20,6 +20,11 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.plus.PlusScopes;
 
+/**
+ * 授权文件类（主要负责加载credential文件）
+ * @author fgq
+ *
+ */
 public class CredentialFile {
 
 	private static Logger logger = LoggerFactory.getLogger(CredentialFile.class);
@@ -37,7 +42,7 @@ public class CredentialFile {
 	 * @throws IOException
 	 * @throws GeneralSecurityException
 	 */
-	public Credential loadCredential(String clientID, String clientSecret, String credentialFilename, String userId)
+	public Credential loadCredential(String clientID, String clientSecret, String credentialFilename)
 			throws IOException, GeneralSecurityException {
 		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		credentialFile = new File(props.getProperty("credential_path") + credentialFilename);
@@ -46,7 +51,7 @@ public class CredentialFile {
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
 				clientID, clientSecret, Collections.singleton(PlusScopes.PLUS_ME))
 				.setDataStoreFactory(dataStoreFactory).build();
-		Credential credential = flow.loadCredential(userId);
+		Credential credential = flow.loadCredential("user");
 		if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
 			return credential;
 		}

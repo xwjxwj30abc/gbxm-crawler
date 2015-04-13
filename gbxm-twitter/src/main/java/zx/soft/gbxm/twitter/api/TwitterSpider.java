@@ -49,7 +49,7 @@ public class TwitterSpider {
 
 				twitterStatus.setId(status.getId());
 				twitterStatus.setUser_id(status.getUser().getId());
-				twitterStatus.setScreen_name(status.getUser().getScreenName());
+				twitterStatus.setScreen_name(status.getUser().getName());
 
 				if (status.getGeoLocation() != null) {
 					twitterStatus.setLatitude(status.getGeoLocation().getLatitude());
@@ -71,7 +71,8 @@ public class TwitterSpider {
 				twitterStatuses.add(twitterStatus);
 
 				RecordInfo record = new RecordInfo();
-				String url = "https://twitter.com/" + status.getUser().getName() + "/status/" + twitterStatus.getId();
+				String url = "https://twitter.com/" + status.getUser().getScreenName() + "/status/"
+						+ twitterStatus.getId();
 				record.setId(CheckSumUtils.getMD5(url).toUpperCase());//状态id,用户id进行MD5加密
 				record.setMid(Long.toString(twitterStatus.getId()));//主id
 				record.setUsername(twitterStatus.getUser_id() + ""); // uid

@@ -31,7 +31,7 @@ public class PlusSample {
 	private static final String APPLICATION_NAME = "zxsoft crawler";
 
 	private static final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"),
-			".store/plus_sample");
+			".store/plus_demo003");
 
 	private static FileDataStoreFactory dataStoreFactory;
 
@@ -46,7 +46,7 @@ public class PlusSample {
 	private static Credential authorize(String userId) throws IOException {
 		/*	GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(
 					PlusSample.class.getResourceAsStream("/client_secrets.json")));
-		*/
+		 */
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY,
 				"804751998958-r10ohle1oem23jlgtff9npk68fh7v53i.apps.googleusercontent.com", "xSgLqQWNjNtj_RmsHfCdmYyG",
 				Collections.singleton(PlusScopes.PLUS_ME)).setDataStoreFactory(dataStoreFactory)
