@@ -14,7 +14,6 @@
 	<description>socila network service crawler</description>
 
 	<modules>
-		<module>gbxm-web</module>
 		<module>gbxm-twitter</module>
 		<module>gbxm-facebook</module>
 		<module>gbxm-google</module>
